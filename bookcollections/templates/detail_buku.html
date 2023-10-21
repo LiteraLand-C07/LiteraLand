@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block meta %}
+<title>{{book.title}}</title>
+{% endblock meta %}
+
 {% block link %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,7 +14,6 @@
         background-color: rgb(86, 85, 85);
     }
 </style>
-
 {% endblock link %}
 
 {% block content %}
@@ -31,12 +34,12 @@
         <a class="text-white link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover" href="">Register</a>
       </div>
     </div>
-  </nav>
+</nav>
 
 
 <!-- DISPLAY BOOK INFORMATION IN  CARD LAYOUT-->
 <div class="container-fluid mt-4 mb-4">
-    <div class="card p-3 book text-bg-dark p-3 shadow-lg rounded" data-isbn="{{book.ISBN}}">
+    <div class="card p-3 book text-bg-dark p-3 shadow-lg rounded" data-isbn="{{book.ISBN}}" book-id="{{book.pk}}" book-page="{{book.page_count}}">
         <div class="row g-2">
             <div class="col-md-4">
                 <img src="" alt="Book Cover" class="img-fluid thumbnail rounded">
@@ -53,11 +56,7 @@
                     <p class="card-text font-monospace"><strong>Language</strong>: {{book.language}}</p>
                     <p class="card-text font-monospace"><strong>Published Date</strong>: {{book.published_date}}</p>
                     <p class="card-text text-start"><strong>Description</strong>:<br> {{book.description}}</p>
-                    <div class="mt-4 d-flex flex-wrap flex-row justify-content-start gap-3">
-                        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal"">Add to Collections</button>
-                        <button class="btn btn-outline-light">Update Book Status</button>
-                        <button class="btn btn-outline-light">Review Book</button>
-                    </div>
+                    <div class="mt-4 d-flex flex-wrap flex-row justify-content-start gap-3" id="button-collection"></div>
                 </div>
             </div>
         </div>
@@ -68,45 +67,32 @@
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content font-monospace fw-bold">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Add to Collections</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+            <div class="modal-header" id="modal-header"></div>
             <div class="modal-body">
-                <form id="form" onsubmit="return false;">
+                <form id="form-collection" onsubmit="return false;">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="rating" class="col-form-label">Rating:</label>
-                        <select class="form-control" id="rating" name="rating">
-                            {% for i in range %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
+                        <select class="form-control" id="rating" name="rating"></select>
                     </div>
                     <div class="mb-3">
                         <label for="current_page" class="col-form-label">Page:</label>
-                        <input type="number" class="form-control" id="current_page" name="current_page"></input>
+                        <input type="number" class="form-control" id="current_page" name="current_page" value=""></input>
                     </div>
                     <div class="mb-3">
                       <label for="status_baca" class="col-form-label">Status:</label>
-                      <select class="form-control" id="status_baca" name="status_baca">
-                          {% for status, display in StatusBaca.choices %}
-                              <option value="{{ status }}">{{ display }}</option>
-                          {% endfor %}
-                      </select>
+                      <select class="form-control" id="status_baca" name="status_baca"></select>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Add to Collections</button>
-            </div>
+            <div class="modal-footer" id="modal-footer"></div>
         </div>
     </div>
 </div>
 
 
 <script>
+
     function getCover() {
         var isbn = document.querySelector('.book').getAttribute('data-isbn')
 
@@ -122,10 +108,168 @@
         var thumb = item.volumeInfo.imageLinks.thumbnail;
 
         let imgZoom = thumb.replace('zoom=1', 'zoom=6')
-        document.querySelector('.thumbnail').setAttribute('src', imgZoom)
+        let imgHttps = imgZoom.replace('http','https')
+        document.querySelector('.thumbnail').setAttribute('src', imgHttps)
     }
 
     getCover()
+
+
+    async function getBookCollection(){
+        var idBook = document.querySelector('.book').getAttribute('book-id')
+        const url = `/collections/get_collection_json/${idBook}/`;
+        return fetch(url).then((res) => res.json())
+    }
+
+    async function refreshPage(){
+        document.getElementById('modal-header').innerHTML = ""
+        document.getElementById('rating').innerHTML = ""
+        document.getElementById('status_baca').innerHTML = ""
+        document.getElementById('modal-footer').innerHTML = ""
+        document.getElementById('button-collection').innerHTML = ""
+
+        const books = await getBookCollection()
+        var statusBacaChoices = [
+            {value: 'C', label: 'Completed'},
+            {value: 'R', label: 'Reading'},
+            {value: 'PR', label: 'Plan to Read'},
+            {value: 'D', label: 'Dropped'}
+        ];
+
+        let modalHeader = ''
+        let ratingHTML = ''
+        let statusHTML = ''
+        let modalFooter = ''
+        let buttonHTML = ''
+
+        if (books.length == 0){
+            modalHeader += `
+            <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Add to MyCollection</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            `
+
+            ratingHTML += '<option value="">Select Rating:</option>'
+            for (var i = 1; i <= 10; i++){
+                ratingHTML += `<option value="${ i }">${ i }</option>`
+            }
+
+            statusHTML += `<option value="">Select Status:</option>`
+            for (var i = 0; i < statusBacaChoices.length; i++) {
+                var choice = statusBacaChoices[i];
+                var value = choice.value;
+                var label = choice.label;
+                statusHTML += `<option value="${value}"}>${label}</option>`
+            }
+
+            modalFooter += `
+            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="addCollection()">Add</button>
+            `
+
+            buttonHTML += `
+            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal"">Add to Collections</button>
+            <button class="btn btn-outline-light">Review Book</button>
+            `
+
+        } else {
+            const book = books[0];  
+
+            modalHeader += `
+            <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Edit Collection</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            `
+            for (var i = 1; i <= 10; i++){
+                ratingHTML += `<option id="rating-${i}" value="${ i }"  ${i == book.fields.rating ? 'selected' : ''}>${ i }</option>`
+            }
+
+            document.getElementById('current_page').setAttribute("value",book.fields.current_page)
+
+            for (var i = 0; i < statusBacaChoices.length; i++) {
+                var choice = statusBacaChoices[i];
+                var value = choice.value;
+                var label = choice.label;
+                statusHTML += `<option value="${value}" ${value == book.fields.status_baca ? 'selected' : ''}>${label}</option>`
+            }
+
+            modalFooter += `
+            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="editCollection()">Edit</button>
+            `
+
+            buttonHTML += `
+            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal"">Update Collection</button>
+            <button class="btn btn-outline-light">Review Book</button>
+            `
+    
+        }
+
+        document.getElementById('modal-header').innerHTML = modalHeader;
+        document.getElementById('rating').innerHTML = ratingHTML
+        document.getElementById('status_baca').innerHTML = statusHTML
+        document.getElementById('modal-footer').innerHTML = modalFooter
+        document.getElementById('button-collection').innerHTML = buttonHTML
+    }
+
+    refreshPage()
+
+    function isValid(rating,current_page,status_baca){
+        if (!rating || !current_page || !status_baca) {
+            // Tampilkan pesan error pada modal jika input tidak valid
+            alert('Harap isi semua field!');
+            return false;
+        }
+
+        var total_page = Number(document.querySelector('.book').getAttribute('book-page'))
+
+        if (current_page < 0 || current_page > total_page){
+            alert('Input yang dimasukkan tidak valid')
+            return false
+        }
+        return true;
+    }
+
+    function addCollection(){
+        var formData = new FormData(document.querySelector('#form-collection'))
+        var rating = formData.get('rating');
+        var current_page = formData.get('current_page');
+        var status_baca = formData.get('status_baca');
+
+        if (isValid(rating,current_page,status_baca)){
+            var id = document.querySelector('.book').getAttribute('book-id')
+            var url = `/collections/add_collection/${id}/`;
+
+            fetch(url,{
+                method:"POST",
+                body: formData
+            }).then(refreshPage)
+
+            document.getElementById("form-collection").reset()
+        }
+        return false
+    }
+
+
+    async function editCollection(){
+        var formData = new FormData(document.querySelector('#form-collection'))
+        var rating = formData.get('rating');
+        var current_page = formData.get('current_page');
+        var status_baca = formData.get('status_baca');
+
+        if (isValid(rating,current_page,status_baca)){
+            const books = await getBookCollection()
+            const book = books[0];
+            var url = `/collections/edit_collection/${book.pk}/`;
+
+            fetch(url,{
+                method:"POST",
+                body: formData
+            }).then(refreshPage)
+
+            document.getElementById("form-collection").reset()
+        }
+        
+        return false
+    }
 
 </script>
 
