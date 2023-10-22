@@ -57,3 +57,12 @@ def edit_collection(request,id):
         return HttpResponse(b"EDITED", status=201)
     
     return HttpResponseNotFound() 
+
+def show_collections(request):
+    book_collections = BookCollection.objects.all()
+    context = {
+        'book_collections':book_collections,
+        'StatusBaca':StatusBaca,
+    }
+
+    return render(request,'collections.html',context)

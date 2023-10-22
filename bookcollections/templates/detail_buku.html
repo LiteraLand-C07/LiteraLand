@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 
+
 {% block meta %}
 <title>{{book.title}}</title>
 {% endblock meta %}
+
 
 {% block link %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,26 +15,43 @@
         font-family: 'Roboto', sans-serif;
         background-color: rgb(86, 85, 85);
     }
+
+    .nav-link:hover {
+    color: #ffffff; /* Atur ke warna yang Anda inginkan */
+    }
 </style>
 {% endblock link %}
+
 
 {% block content %}
 
 <!-- NAVBAR -->
-<nav class="navbar bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand text-white" href="#">
-        <i class="bi bi-journal-bookmark-fill"></i>
-        LiteraLand
-      </a>
-      <div class="d-flex flex-wrap flex-row gap-3 ">
-        <a class="text-white link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover" href="">Browse Book</a>
-        <a class="text-white link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover" href="">My Collections</a>
-        <a class="text-white link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover" href="">Recommendation</a>
-        <!-- DISPLAY IF IN GUEST MODE -->
-        <a class="text-white link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover" href="">Login</a>
-        <a class="text-white link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover" href="">Register</a>
-      </div>
+        <a class="navbar-brand text-white" href="#">
+            <i class="bi bi-journal-bookmark-fill"></i>
+            LiteraLand
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link my-2 my-lg-0" href="">Browse Book</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link my-2 my-lg-0" href="">Recommendation</a>
+                </li>
+                <!-- DISPLAY IF IN GUEST MODE -->
+                <li class="nav-item">
+                    <a class="nav-link my-2 my-lg-0" href="">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link my-2 my-lg-0" href="">Register</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 
@@ -197,7 +216,7 @@
             `
 
             buttonHTML += `
-            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal"">Update Collection</button>
+            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal"">Edit Collection</button>
             <button class="btn btn-outline-light">Review Book</button>
             `
     
