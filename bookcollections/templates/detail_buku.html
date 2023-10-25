@@ -43,6 +43,9 @@
                 <li class="nav-item">
                     <a class="nav-link my-2 my-lg-0" href="">Recommendation</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link my-2 my-lg-0" href="/collections/">MyCollections</a>
+                </li>
                 <!-- DISPLAY IF IN GUEST MODE -->
                 <li class="nav-item">
                     <a class="nav-link my-2 my-lg-0" href="">Login</a>
@@ -167,7 +170,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             `
 
-            ratingHTML += '<option value="">Select Rating:</option>'
+            ratingHTML += '<option value="0">Select Rating:</option>'
             for (var i = 1; i <= 10; i++){
                 ratingHTML += `<option value="${ i }">${ i }</option>`
             }
@@ -197,6 +200,8 @@
             <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Edit Collection</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             `
+            
+            ratingHTML += '<option value="0">Select Rating:</option>'
             for (var i = 1; i <= 10; i++){
                 ratingHTML += `<option id="rating-${i}" value="${ i }"  ${i == book.fields.rating ? 'selected' : ''}>${ i }</option>`
             }

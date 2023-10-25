@@ -70,65 +70,8 @@
 </div>
 
 
-
-
 <!-- DAFTAR KOLEKSI -->
-<div id="card-deck" class="row">
-    {% for collection in book_collections %}
-    <div class="col-md-6 card-container" data-status-baca="{{ collection.status_baca }}">
-        <div class="card mb-4 text-bg-dark">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="" class="img-fluid rounded-start thumbnail" alt="{{ collection.book.title }} cover" data-isbn="{{collection.book.ISBN}}" style="width: 100%;height: 100%;;">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ collection.book.title }}</h5>
-                        <p class="card-text">Author: {{ collection.book.author }}</p>
-                        <p class="card-text">Genre : {{collection.book.genre}}</p>
-                        <p class="card-text">Page : {{collection.current_page}}/{{collection.book.page_count}}</p>
-                        <p class="card-text">Rating : <span class="badge bg-warning text-dark">{{ collection.rating }}</span></p>
-                        <p class="card-text">Status : {{collection.get_status_baca_display}}</p>
-                        <div class="d-flex flex-wrap flex-row justify-content-start gap-3" id="button-collection">
-                            <button class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal"">Edit</button>
-                            <button class="btn btn-outline-light btn-sm">Read</button>
-                            <button class="btn btn-outline-light btn-sm">Delete</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-
-<!-- MODAL TO EDIT COLLECTIONS -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content font-monospace fw-bold">
-            <div class="modal-header" id="modal-header"></div>
-            <div class="modal-body">
-                <form id="form-collection" onsubmit="return false;">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="rating" class="col-form-label">Rating:</label>
-                        <select class="form-control" id="rating" name="rating"></select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="current_page" class="col-form-label">Page:</label>
-                        <input type="number" class="form-control" id="current_page" name="current_page" value=""></input>
-                    </div>
-                    <div class="mb-3">
-                      <label for="status_baca" class="col-form-label">Status:</label>
-                      <select class="form-control" id="status_baca" name="status_baca"></select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer" id="modal-footer"></div>
-        </div>
-    </div>
-</div>
+<div id="card-deck" class="row"></div>
 
 <script>
 
@@ -152,7 +95,79 @@
         thumbnail.setAttribute('src', imgHttps);
     }
 
-    getCover();
+    async function getBookCollections(){
+        return fetch("{% url 'bookcollections:get_collections_json' %}").then((res) => res.json())
+    }
+
+    async function refreshCollections(){
+        document.getElementById("card-deck").innerHTML = ""
+        const collections = await getBookCollections()
+        
+        let htmlString = ''
+        collections.forEach((collection) => {
+            htmlString += `
+            <div class="col-md-6 card-container" id="data-${collection.pk}" data-status-baca="${ collection.status_baca }">
+                <div class="card mb-4 text-bg-dark">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="" class="img-fluid rounded-start thumbnail" alt="${ collection.title } cover" data-isbn="${collection.ISBN}" style="width: 100%;height: 100%;;">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title"><a class="text-decoration-none text-white" href="/collections/detail_buku/${collection.book}/">${ collection.title }</a></h5>
+                                <p class="card-text">Author : ${ collection.author }</p>
+                                <p class="card-text">Genre   : ${collection.genre}</p>
+                                <p class="card-text">
+                                    Page     : 
+                                    <span id="page-${collection.pk}" class="fw-bolder"> ${collection.current_page}</span> / ${collection.page_count}
+                                    <button onclick="decreaseCurrentPage(${collection.pk},true,${collection.page_count})" class="btn btn-secondary btn-sm ms-2 me-2" style="--bs-btn-font-size: .65rem;">- -</button>
+                                    <button onclick="decreaseCurrentPage(${collection.pk},false,${collection.page_count})" class="btn btn-secondary btn-sm me-2" style="--bs-btn-font-size: .65rem;">-</button>
+                                    <button onclick="addCurrentPage(${collection.pk},false,${collection.page_count})" class="btn btn-secondary btn-sm me-2" style="--bs-btn-font-size: .65rem;">+</button>
+                                    <button onclick="addCurrentPage(${collection.pk},true,${collection.page_count})" class="btn btn-secondary btn-sm me-2" style="--bs-btn-font-size: .65rem;">++</button>
+                                </p>
+                                <p class="card-text">
+                                     Rating  :
+                                     <select id="status-${collection.pk}" onchange="editRating(${collection.pk}, this.value)" class="text-bg-dark fw-bolder" style="border: none; background: none;">
+                                        <option value="0" ${(collection.rating === 1) ? 'selected' : ''}>None</option>
+                                        <option value="1" ${(collection.rating === 1) ? 'selected' : ''}>1</option>
+                                        <option value="2" ${(collection.rating === 2) ? 'selected' : ''}>2</option>
+                                        <option value="3" ${(collection.rating === 3) ? 'selected' : ''}>3</option>
+                                        <option value="4" ${(collection.rating === 4) ? 'selected' : ''}>4</option>
+                                        <option value="5" ${(collection.rating === 5) ? 'selected' : ''}>5</option>
+                                        <option value="6" ${(collection.rating === 6) ? 'selected' : ''}>6</option>
+                                        <option value="7" ${(collection.rating === 7) ? 'selected' : ''}>7</option>
+                                        <option value="8" ${(collection.rating === 8) ? 'selected' : ''}>8</option>
+                                        <option value="9" ${(collection.rating === 9) ? 'selected' : ''}>9</option>
+                                        <option value="10" ${(collection.rating === 10) ? 'selected' : ''}>10</option>
+                                    </select>
+
+                                </p>
+                                <p class="card-text">
+                                    Status  : 
+                                    <select id="status-${collection.pk}" onchange="editStatus(${collection.pk},this.value)" class="text-bg-dark fw-bolder" style="border: none; background: none;">
+                                        <option value="C" ${(collection.status_baca === "C") ? 'selected' : ''}>Completed</option>
+                                        <option value="R" ${(collection.status_baca === "R") ? 'selected' : ''}>Reading</option>
+                                        <option value="PR" ${(collection.status_baca === "PR") ? 'selected' : ''}>Plan to Read</option>
+                                        <option value="D" ${(collection.status_baca === "D") ? 'selected' : ''}>Dropped</option>
+                                    </select>
+                                </p>
+                                <div class="d-flex flex-wrap flex-row justify-content-center gap-3" id="button-collection">
+                                    <button class="btn btn-outline-primary btn-sm">Read</button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteCollection(${collection.pk})">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `
+        })
+
+        document.getElementById('card-deck').innerHTML = htmlString
+        getCover()
+    }
+
+    refreshCollections()
 
     function addFilterHandler(){
         // Dapatkan semua tombol
@@ -176,6 +191,100 @@
     }
 
     addFilterHandler()
+
+    function refreshNumberOfPage(id, isTen, isAdd,totalPage) {
+        var pageElement = document.getElementById(`page-${id}`);
+        if (pageElement) {
+            var currentPage = Number(pageElement.innerText);
+            if (isTen) {
+                if (isAdd) {
+                    if (currentPage + 10 <= totalPage)
+                        pageElement.innerText = currentPage + 10;
+                    else
+                        pageElement.innerText = totalPage
+                } else {
+                    if (currentPage - 10 >= 0)
+                        pageElement.innerText = currentPage - 10;
+                    else
+                        pageElement.innerText = 0; // Atur ke 0 jika kurang dari 0
+                }
+            } else {
+                if (isAdd) {
+                    if (currentPage + 1 <= totalPage)
+                        pageElement.innerText = currentPage + 1;
+                    else
+                        pageElement.innerText = totalPage
+                } else {
+                    if (currentPage - 1 >= 0)
+                        pageElement.innerText = currentPage - 1;
+                    else
+                        pageElement.innerText = 0; // Atur ke 0 jika kurang dari 0
+                }
+            }
+        }
+    }
+
+
+    function addCurrentPage(id,isTen,totalPage){
+        var url;
+        if (isTen){
+            url = `/collections/add_ten_current_page/${id}/`
+        } else{
+            url = `/collections/add_current_page/${id}/`
+        }
+
+        fetch(url,{
+            method:'POST',
+        }).then(() => refreshNumberOfPage(id,isTen,true,totalPage))
+    }
+
+    function decreaseCurrentPage(id,isTen,totalPage){
+        var url;
+        if (isTen){
+            url = `/collections/decrease_ten_current_page/${id}/`
+        } else{
+            url = `/collections/decrease_current_page/${id}/`
+        }
+
+        fetch(url,{
+            method:'POST',
+        }).then(() => refreshNumberOfPage(id,isTen,false,totalPage))
+    }
+
+    function editRating(id,newRating){
+        const url = `/collections/edit_rating_collection/${id}/${Number(newRating)}/`
+        fetch(url,{
+            method:'POST',
+        })
+
+        return false
+    }
+
+    function refreshStatus(id,newStatus){
+        var pageElement = document.getElementById(`data-${id}`)
+        pageElement.setAttribute("data-status-baca",newStatus)
+        
+    }
+
+    function editStatus(id,newStatus){
+        const url = `/collections/edit_status_collection/${id}/${newStatus}/`
+        fetch(url,{
+            method:'POST',
+        }).then(() => refreshStatus(id,newStatus))
+
+        return false
+    }
+
+    function deleteCollection(id){
+        const url = `/collections/delete_collection/${id}/`
+        fetch(url,{
+            method:'DELETE'
+        }).then(refreshCollections)
+
+        return false
+    }
+
+    
 </script>
   
 {% endblock %}
