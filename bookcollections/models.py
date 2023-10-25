@@ -10,7 +10,7 @@ class StatusBaca(models.TextChoices):
 
 class BookCollection(models.Model):
     CHOICES = [(i,i) for i in range(11)]
-    book = models.ManyToManyField(Book)
+    book = models.ForeignKey(Book,on_delete=models.CASCADE,null=True)
     rating = models.IntegerField(choices=CHOICES)
     current_page = models.IntegerField()
     status_baca = models.CharField(
