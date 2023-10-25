@@ -152,7 +152,7 @@
                                     </select>
                                 </p>
                                 <div class="d-flex flex-wrap flex-row justify-content-center gap-3" id="button-collection">
-                                    <button class="btn btn-outline-primary btn-sm">Read</button>
+                                    <a class="btn btn-outline-primary btn-sm" href="read_book_content/${collection.book}/">Read</a>
                                     <button class="btn btn-outline-danger btn-sm" onclick="deleteCollection(${collection.pk})">Delete</button>
                                 </div>
                             </div>
@@ -287,4 +287,4 @@
     
 </script>
   
-{% endblock %}
+{% endblock content%}
