@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'shared_models',
     'bookcollections',
+    'forumDiskusi',
 ]
 
 MIDDLEWARE = [
