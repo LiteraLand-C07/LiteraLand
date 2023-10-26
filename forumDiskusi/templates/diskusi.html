@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">LiteraLand</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:history.back()">Go Back</a>
+                </li>
+                <!-- fitur lain-->
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="display-4">Reviews for {{ book.title }}</h1>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <form id="reviewForm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="reviewTextarea">Write your review:</label>
+                        <textarea class="form-control" id="reviewTextarea" name="review" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row mt-5" id="reviews">
+            {% for review in reviews %}
+                <div class="col-md-12 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            {{ review.review }}
+                        </div>
+                        <div class="card-footer text-muted">
+                            By {{ review.user.username }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('#reviewForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const review = form.querySelector('textarea').value;
+                const csrf = form.querySelector('input[name=csrfmiddlewaretoken]').value;
+
+                fetch('/forumDiskusi/book_reviews/{{ book.id }}/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf,
+                    },
+                    body: JSON.stringify({ review: review })
+                })
+            
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Display the review under the submit button
+                        const reviewsDiv = document.querySelector('#reviews');
+                        
+                        const newReviewCol = document.createElement('div');
+                        newReviewCol.className = 'col-md-12 mb-3';
+                        
+                        const newReviewCard = document.createElement('div');
+                        newReviewCard.className = 'card';
+                        
+                        const cardBody = document.createElement('div');
+                        cardBody.className = 'card-body';
+                        cardBody.textContent = review;
+                        
+                        const cardFooter = document.createElement('div');
+                        cardFooter.className = 'card-footer text-muted';
+                        cardFooter.textContent = 'By ' + '{{ user.username }}';
+                        
+                        newReviewCard.appendChild(cardBody);
+                        newReviewCard.appendChild(cardFooter);
+                        newReviewCol.appendChild(newReviewCard);
+                        reviewsDiv.appendChild(newReviewCol);
+
+                        // Redirect to the forum page
+                        window.location.href = '/forumDiskusi/'; 
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+{% endblock %}
