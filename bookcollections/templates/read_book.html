@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+
+{% block meta %}
+<title>Read - {{book.title}}</title>
+{% endblock meta %}
+
+
+{% block link %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap" rel="stylesheet">
+<script type="text/javascript" src="https://www.google.com/books/jsapi.js"></script>
+<style>
+    body {
+        font-family: 'Tilt Neon', sans-serif;
+        background-color: rgb(86, 85, 85);
+    }
+
+    .nav-link:hover {
+    color: #ffffff; /* Atur ke warna yang Anda inginkan */
+    }
+</style>
+{% endblock link %}
+
+{% block nav %}
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="">Browse Book</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="">Recommendation</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="/collections/">MyCollections</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="">Logout</a>
+    </li>
+{% endblock nav %}
+
+{% block content %}
+
+<!-- HEADER -->
+<h1 class="text-white text-center mt-4 mb-4"><a class="text-decoration-none text-white" href="/collections/detail_buku/{{book.pk}}/">{{book.title}}</a></h1>
+
+<!-- EMBEDDED VIEWER -->
+<div id="error-message" class="text-center text-danger"></div>
+<div id="viewerCanvas" data-ISBN = "{{book.ISBN}}" style="width: 100%; height: 1000px;"></div>
+
+
+<script>
+    google.books.load();
+
+    function displayErrorMessage(message) {
+        const errorMessageElement = document.getElementById('error-message');
+        errorMessageElement.textContent = message;
+    }
+
+    function initialize() {
+        var viewer = new google.books.DefaultViewer(document.getElementById('viewerCanvas'));
+        const ISBN = document.getElementById('viewerCanvas').getAttribute('data-ISBN')
+        viewer.load(`ISBN:${ISBN}`, function() {
+            displayErrorMessage("Could not embed the book!");
+        })
+    }
+
+    google.books.setOnLoadCallback(initialize);
+</script>
+
+{% endblock content %}
