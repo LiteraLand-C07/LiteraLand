@@ -1,0 +1,67 @@
+{% extends 'base.html' %} 
+
+{% block meta %}
+<title>Register</title>
+{% endblock meta %} 
+
+{% block nav %}
+<li class="nav-item">
+    <a class="nav-link my-2 my-lg-0" href="">Browse Book</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:login' %}">Login</a>
+</li>
+{% endblock nav %}
+
+
+{% block content %}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+  <div class="login border p-4">
+    <h1 class="mb-3 text-center"><i class="bi bi-person"></i>Register</h1>
+
+    <form method="POST">
+      {% csrf_token %}
+    
+      {% for field in form %}
+
+        <div class="form-group mb-3 d-grid">
+          <strong>{{field.label}}</strong>
+          {% if field.name == "password1" or field.name == "password2" %}
+            <input type="password" name="{{ field.name }}" class="responsive-input" value="{{ field.value|default_if_none:'' }}" class="form-control" placeholder="{{field.label}}">
+          {% else %}
+            <input type="text" name="{{ field.name }}" class="responsive-input" value="{{ field.value|default_if_none:'' }}" class="form-control" placeholder="{{field.label}}">
+          {% endif %}
+        </div>
+
+        <div class="form-group mb-3 alert alert-primary small">
+          {{field.help_text}}
+        </div>
+
+        {% if field.errors %}
+          <div class="form-group mb-3 alert alert-danger small">
+            {{field.errors}}
+          </div>
+        {% endif %}
+
+      {% endfor %}
+        
+      <div class="form-group mb-3 d-grid">
+        <button class="btn btn-outline-primary" type="submit">Daftar</button>
+      </div>
+
+    </form>
+
+    {% if messages %}
+    <div class="alert alert-danger"></div>
+      <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    <div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock content %}
