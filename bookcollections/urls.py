@@ -1,5 +1,5 @@
 from django.urls import path
-from bookcollections.views import show_detail_buku,add_collection,get_collection_json,edit_collection,show_collections,add_current_page,add_ten_current_page,decrease_current_page,decrease_ten_current_page,edit_rating_collection,edit_status_collection,get_collections_json,delete_collection
+from bookcollections.views import show_detail_buku,add_collection,get_collection_json,edit_collection,show_collections,add_current_page,add_ten_current_page,decrease_current_page,decrease_ten_current_page,edit_rating_collection,edit_status_collection,get_collections_json,delete_collection,read_book_content
 
 app_name = 'bookcollections'
 
@@ -17,4 +17,5 @@ urlpatterns = [
     path('edit_rating_collection/<int:id>/<int:new_rating>/',edit_rating_collection,name="edit_rating_collection"),
     path('edit_status_collection/<int:id>/<str:new_status>/',edit_status_collection,name="edit_status_collection"),
     path('delete_collection/<int:id>/',delete_collection,name="delete_collection"),
+    path('read_book_content/<int:id>/',read_book_content,name="read_book_content"),
 ]

@@ -184,3 +184,12 @@ def delete_collection(request,id):
         return HttpResponse(b"DELETED",status=201)
     
     return HttpResponseNotFound()
+
+def read_book_content(request,id):
+    book = Book.objects.get(pk=id)
+
+    context = {
+        'book': book,
+    }
+
+    return render(request,'read_book.html',context)
