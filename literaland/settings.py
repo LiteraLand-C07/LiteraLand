@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'shared_models',
     'bookcollections',
     'forumDiskusi',
+    'rankingBuku',
 ]
 
 MIDDLEWARE = [

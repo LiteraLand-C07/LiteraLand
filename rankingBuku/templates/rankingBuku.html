@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block link %}
+<style>
+    .custom-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 10px;
+    }
+</style>
+{% endblock link %}
+
+{% block content %}
+<title>Ranking Buku</title>
+
+<p>halo</p>
+<h1>Book Lists</h1>
+
+<div id="card_deck" class="row"></div>
+
+<script>
+    async function getListBooks() {
+        return fetch("{% url 'get_book_lists_json' %}").then((res) => res.json())
+    }
+
+    async function refreshListBooks() {
+        document.getElementById("card_deck").innerHTML = "";
+        const booklists = await getListBooks();
+
+        let htmlString = '<div class="row">';
+        booklists.forEach((listbook) => {
+            const imageUrl = "{% if listbook.fields.image %}{{ listbook.fields.image.url }}{% else %}/static/default_image.png{% endif %}";
+            htmlString += `
+            <div class="col-md-3">
+                <div class="card custom-card">
+                    <img id="cover-${listbook.pk}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover; src="${listbook.fields.image}" alt="List Image" width="200">
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px;">${listbook.fields.name}</h5>
+                        <p class="card-text" style="font-weight: 400;">${listbook.fields.description}</p>
+                        <p class="card-text" style="font-weight: 400;">${listbook.fields.books}</p>
+                    </div>
+                </div>
+            </div>
+            `;
+        });
+        document.getElementById('card_deck').innerHTML = htmlString;
+        
+    }
+
+    refreshListBooks()
+</script>
+
+<a href="{% url 'create_book_list' %}" class="btn btn-primary">Create Book List</a>
+{% endblock %}

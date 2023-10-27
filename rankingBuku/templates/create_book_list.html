@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+
+{% block meta %}
+<style>
+  .grid-container-element { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    grid-gap: 20px; 
+    width: 100%; 
+  } 
+
+  .grid-child-element { 
+      margin: 10px; 
+  }
+</style>
+
+{% endblock meta %}
+
+
+{% block link %}
+
+{% endblock link %}
+
+
+{% block content %}
+<body>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+  </form>
+</body>
+
+{% endblock content %}
