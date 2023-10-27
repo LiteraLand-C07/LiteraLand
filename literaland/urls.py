@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('collections/',include('bookcollections.urls')),
     path('forumDiskusi/',include('forumDiskusi.urls')),
+    path('authentication/',include('shared_models.urls')),
     path('administrator/', include('administrator.urls')),
 ]
