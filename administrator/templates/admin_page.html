@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+{% endblock meta %}
+
+{% block link %} 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+{% endblock link %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-3 px-0">
+            <div class="container-fluid bg-dark mx-0" style="height: 100vh; overflow: auto;color: white;">
+
+            </div>
+        </div>
+        <div class="col-9 px-0">
+            <div class="container-fluid px-4" style="height: 100vh; overflow: auto;">
+                <div class="card mx-auto my-3">
+                    <div class="card body bg-secondary-subtle">
+                        <h4 class="card-title ms-3 mt-3">Add Book to Database</h4>
+                        <form class="mx-3 my-2" id="CreateBookForm">
+                            {% csrf_token %}
+                            <table>
+                                {{form.as_table}}
+                            </table>
+                        </form>
+                        <script>
+                            $('table').css("width", "100%")
+                            $("table label").attr("class", "col-form-label")
+                            $("table input").attr("class", "form-control")
+                            $("table textarea").attr("class", "form-control")
+                            $("table textarea").attr("rows", "5")
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
