@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+
+
+{% block meta %}
+<title>MyCollections</title>
+{% endblock meta %}
+
+
+{% block link %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: rgb(86, 85, 85);
+    }
+
+    .nav-link:hover {
+    color: #ffffff; /* Atur ke warna yang Anda inginkan */
+    }
+</style>
+{% endblock link %}
+
+
+{% block content %}
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand text-white" href="#">
+            <i class="bi bi-journal-bookmark-fill"></i>
+            LiteraLand
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link my-2 my-lg-0" href="">Browse Book</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link my-2 my-lg-0" href="">Recommendation</a>
+                </li>
+                <!-- DISPLAY IF IN GUEST MODE -->
+                <li class="nav-item">
+                    <a class="nav-link my-2 my-lg-0" href="">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- HEADER HALAMAN  -->
+<h1 class="text-white text-center mt-4">MyCollections</h1>
+<div class="container my-4">
+<div class="mb-3 d-flex align-items-center">
+    <label class="me-3 mb-0 text-white">
+        Filter by Status Baca:
+        <div id="status_filter" name="status_filter" role="group" class="mt-2 d-flex flex-row gap-2 flex-wrap">
+            <button type="button" class="btn btn-warning" value="all">All</button>
+            <button type="button" class="btn btn-primary" value="C">Completed</button>
+            <button type="button" class="btn btn-success" value="R">Reading</button>
+            <button type="button" class="btn btn-danger" value="D">Dropped</button>
+            <button type="button" class="btn btn-secondary" value="PR">Plan to Read</button>
+        </div>
+    </label>
+</div>
+
+
+<!-- DAFTAR KOLEKSI -->
+<div id="card-deck" class="row"></div>
+
+<script>
+
+    function getCover() {
+        var thumbnails = document.querySelectorAll('.thumbnail');
+        thumbnails.forEach(function(thumbnail) {
+            var isbn = thumbnail.getAttribute('data-isbn');
+            const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn;
+            fetch(url, {
+                method: 'GET',
+            }).then(response => response.json())
+                .then(response => handleResponse(response, thumbnail))
+        });
+    }
+
+    function handleResponse(response, thumbnail) {
+        var item = response.items[0];
+        var thumb = item.volumeInfo.imageLinks.thumbnail;
+        let imgZoom = thumb.replace('zoom=1', 'zoom=6')
+        let imgHttps = imgZoom.replace('http', 'https');
+        thumbnail.setAttribute('src', imgHttps);
+    }
+
+    async function getBookCollections(){
+        return fetch("{% url 'bookcollections:get_collections_json' %}").then((res) => res.json())
+    }
+
+    async function refreshCollections(){
+        document.getElementById("card-deck").innerHTML = ""
+        const collections = await getBookCollections()
+        
+        let htmlString = ''
+        collections.forEach((collection) => {
+            htmlString += `
+            <div class="col-md-6 card-container" id="data-${collection.pk}" data-status-baca="${ collection.status_baca }">
+                <div class="card mb-4 text-bg-dark">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="" class="img-fluid rounded-start thumbnail" alt="${ collection.title } cover" data-isbn="${collection.ISBN}" style="width: 100%;height: 100%;;">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title"><a class="text-decoration-none text-white" href="/collections/detail_buku/${collection.book}/">${ collection.title }</a></h5>
+                                <p class="card-text">Author : ${ collection.author }</p>
+                                <p class="card-text">Genre   : ${collection.genre}</p>
+                                <p class="card-text">
+                                    Page     : 
+                                    <span id="page-${collection.pk}" class="fw-bolder"> ${collection.current_page}</span> / ${collection.page_count}
+                                    <button onclick="decreaseCurrentPage(${collection.pk},true,${collection.page_count})" class="btn btn-secondary btn-sm ms-2 me-2" style="--bs-btn-font-size: .65rem;">- -</button>
+                                    <button onclick="decreaseCurrentPage(${collection.pk},false,${collection.page_count})" class="btn btn-secondary btn-sm me-2" style="--bs-btn-font-size: .65rem;">-</button>
+                                    <button onclick="addCurrentPage(${collection.pk},false,${collection.page_count})" class="btn btn-secondary btn-sm me-2" style="--bs-btn-font-size: .65rem;">+</button>
+                                    <button onclick="addCurrentPage(${collection.pk},true,${collection.page_count})" class="btn btn-secondary btn-sm me-2" style="--bs-btn-font-size: .65rem;">++</button>
+                                </p>
+                                <p class="card-text">
+                                     Rating  :
+                                     <select id="status-${collection.pk}" onchange="editRating(${collection.pk}, this.value)" class="text-bg-dark fw-bolder" style="border: none; background: none;">
+                                        <option value="0" ${(collection.rating === 1) ? 'selected' : ''}>None</option>
+                                        <option value="1" ${(collection.rating === 1) ? 'selected' : ''}>1</option>
+                                        <option value="2" ${(collection.rating === 2) ? 'selected' : ''}>2</option>
+                                        <option value="3" ${(collection.rating === 3) ? 'selected' : ''}>3</option>
+                                        <option value="4" ${(collection.rating === 4) ? 'selected' : ''}>4</option>
+                                        <option value="5" ${(collection.rating === 5) ? 'selected' : ''}>5</option>
+                                        <option value="6" ${(collection.rating === 6) ? 'selected' : ''}>6</option>
+                                        <option value="7" ${(collection.rating === 7) ? 'selected' : ''}>7</option>
+                                        <option value="8" ${(collection.rating === 8) ? 'selected' : ''}>8</option>
+                                        <option value="9" ${(collection.rating === 9) ? 'selected' : ''}>9</option>
+                                        <option value="10" ${(collection.rating === 10) ? 'selected' : ''}>10</option>
+                                    </select>
+
+                                </p>
+                                <p class="card-text">
+                                    Status  : 
+                                    <select id="status-${collection.pk}" onchange="editStatus(${collection.pk},this.value)" class="text-bg-dark fw-bolder" style="border: none; background: none;">
+                                        <option value="C" ${(collection.status_baca === "C") ? 'selected' : ''}>Completed</option>
+                                        <option value="R" ${(collection.status_baca === "R") ? 'selected' : ''}>Reading</option>
+                                        <option value="PR" ${(collection.status_baca === "PR") ? 'selected' : ''}>Plan to Read</option>
+                                        <option value="D" ${(collection.status_baca === "D") ? 'selected' : ''}>Dropped</option>
+                                    </select>
+                                </p>
+                                <div class="d-flex flex-wrap flex-row justify-content-center gap-3" id="button-collection">
+                                    <button class="btn btn-outline-primary btn-sm">Read</button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteCollection(${collection.pk})">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `
+        })
+
+        document.getElementById('card-deck').innerHTML = htmlString
+        getCover()
+    }
+
+    refreshCollections()
+
+    function addFilterHandler(){
+        // Dapatkan semua tombol
+        var buttons = document.getElementById('status_filter').getElementsByTagName('button');
+
+        // Tambahkan event handler untuk setiap tombol
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener('click', function() {
+                var selectedStatus = this.value;
+                var cards = document.getElementsByClassName('card-container');
+                for (var i = 0; i < cards.length; i++) {
+                    var card = cards[i];
+                    if (selectedStatus === "all" || card.getAttribute('data-status-baca') === selectedStatus) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+    }
+
+    addFilterHandler()
+
+    function refreshNumberOfPage(id, isTen, isAdd,totalPage) {
+        var pageElement = document.getElementById(`page-${id}`);
+        if (pageElement) {
+            var currentPage = Number(pageElement.innerText);
+            if (isTen) {
+                if (isAdd) {
+                    if (currentPage + 10 <= totalPage)
+                        pageElement.innerText = currentPage + 10;
+                    else
+                        pageElement.innerText = totalPage
+                } else {
+                    if (currentPage - 10 >= 0)
+                        pageElement.innerText = currentPage - 10;
+                    else
+                        pageElement.innerText = 0; // Atur ke 0 jika kurang dari 0
+                }
+            } else {
+                if (isAdd) {
+                    if (currentPage + 1 <= totalPage)
+                        pageElement.innerText = currentPage + 1;
+                    else
+                        pageElement.innerText = totalPage
+                } else {
+                    if (currentPage - 1 >= 0)
+                        pageElement.innerText = currentPage - 1;
+                    else
+                        pageElement.innerText = 0; // Atur ke 0 jika kurang dari 0
+                }
+            }
+        }
+    }
+
+
+    function addCurrentPage(id,isTen,totalPage){
+        var url;
+        if (isTen){
+            url = `/collections/add_ten_current_page/${id}/`
+        } else{
+            url = `/collections/add_current_page/${id}/`
+        }
+
+        fetch(url,{
+            method:'POST',
+        }).then(() => refreshNumberOfPage(id,isTen,true,totalPage))
+    }
+
+    function decreaseCurrentPage(id,isTen,totalPage){
+        var url;
+        if (isTen){
+            url = `/collections/decrease_ten_current_page/${id}/`
+        } else{
+            url = `/collections/decrease_current_page/${id}/`
+        }
+
+        fetch(url,{
+            method:'POST',
+        }).then(() => refreshNumberOfPage(id,isTen,false,totalPage))
+    }
+
+    function editRating(id,newRating){
+        const url = `/collections/edit_rating_collection/${id}/${Number(newRating)}/`
+        fetch(url,{
+            method:'POST',
+        })
+
+        return false
+    }
+
+    function refreshStatus(id,newStatus){
+        var pageElement = document.getElementById(`data-${id}`)
+        pageElement.setAttribute("data-status-baca",newStatus)
+        
+    }
+
+    function editStatus(id,newStatus){
+        const url = `/collections/edit_status_collection/${id}/${newStatus}/`
+        fetch(url,{
+            method:'POST',
+        }).then(() => refreshStatus(id,newStatus))
+
+        return false
+    }
+
+    function deleteCollection(id){
+        const url = `/collections/delete_collection/${id}/`
+        fetch(url,{
+            method:'DELETE'
+        }).then(refreshCollections)
+
+        return false
+    }
+
+    
+</script>
+  
+{% endblock %}
