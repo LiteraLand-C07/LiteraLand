@@ -149,6 +149,7 @@
         document.getElementById('status_baca').innerHTML = ""
         document.getElementById('modal-footer').innerHTML = ""
         document.getElementById('button-collection').innerHTML = ""
+        var idBook = document.querySelector('.book').getAttribute('book-id')
 
         const books = await getBookCollection()
         var statusBacaChoices = [
@@ -190,7 +191,7 @@
 
             buttonHTML += `
             <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal""><i class="bi bi-plus-circle me-1"></i>Add to Collections</button>
-            <button class="btn btn-outline-light"><i class="bi bi-chat-dots me-1"></i>Review Book</button>
+            <a class="btn btn-outline-light" href="/forumDiskusi/book_reviews/${idBook}/"><i class="bi bi-chat-dots me-1"></i>Review Book</a>
             `
 
         } else {
@@ -222,7 +223,7 @@
 
             buttonHTML += `
             <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal""><i class="bi bi-pencil-square me-1"></i>Edit Collection</button>
-            <button class="btn btn-outline-light"><i class="bi bi-chat-dots me-1"></i>Review Book</button>
+            <a class="btn btn-outline-light" href="/forumDiskusi/book_reviews/${idBook}/"><i class="bi bi-chat-dots me-1"></i>Review Book</a>
             `
     
         }
