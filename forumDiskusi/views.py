@@ -25,7 +25,7 @@ from django.urls import reverse
 # @login_required(login_url='/login')
 def book_reviews(request, book_id):
     book = Book.objects.get(pk=book_id)
-    reviews = BookReview.objects.filter(book=book).values('username', 'review') # Getting usernames and reviews
+    reviews = BookReview.objects.filter(book=book_id).select_related('user') # Getting usernames and reviews
     review_form = BookReviewForm()
     # print(123)
     # average_rating = BookReview.objects.filter(book=book).aggregate(rating=Avg)
@@ -36,7 +36,7 @@ def book_reviews(request, book_id):
     #     new_review = BookReview(book=book, review=review_text)
     #     new_review.save()
     #     return JsonResponse({'status': 'success'})
-    context = {'book': book, 'reviews': reviews, 'review_form': review_form}
+    context = {'book': book, 'reviews': reviews, 'review_form': review_form, 'current_user': request.user}
     # if request.method == 'GET':
     return render(request, 'diskusi.html', context)
 
@@ -79,3 +79,18 @@ def ajax_add_review(request, pid):
          }
     )
 
+def delete_review(request, book_id):
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return JsonResponse({'status': 'fail', 'message': 'User not authenticated'})
+
+        review_id = request.POST.get('review_id')
+        try:
+            review = BookReview.objects.get(pk=review_id)
+            if review.user == request.user or request.user.is_superuser:  # check if the user is the owner or admin
+                review.delete()
+                return JsonResponse({'status': 'success', 'message': 'Review deleted successfully'})
+            else:
+                return JsonResponse({'status': 'fail', 'message': 'Permission denied'})
+        except BookReview.DoesNotExist:
+            return JsonResponse({'status': 'fail', 'message': 'Review does not exist'})
