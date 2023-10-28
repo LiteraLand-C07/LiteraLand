@@ -17,7 +17,7 @@
     }
 
     .nav-link:hover {
-    color: #ffffff; /* Atur ke warna yang Anda inginkan */
+    color: #ffffff;
     }
 </style>
 {% endblock link %}
@@ -35,22 +35,31 @@
     </li>
 {% endblock nav %}
 
+
 {% block content %}
 
-<!-- HEADER HALAMAN  -->
+<!-- HEADER HALAMAN DAN FILTER INPUT -->
 <h1 class="text-white text-center mt-4"><i class="bi bi-folder me-2"></i>{{user}}-Collections</h1>
 <div class="container my-4">
 <div class="mb-3 d-flex align-items-center">
     <label class="me-3 mb-0 text-white">
         Filter Collection:
-        <div id="status_filter" name="status_filter" role="group" class="mt-2 d-flex flex-row gap-2 flex-wrap">
+        <div id="status_filter" name="status_filter" role="group" class="mt-2 d-flex flex-row gap-2 flex-wrap mb-3">
             <button type="button" class="btn btn-warning" value="all">All</button>
             <button type="button" class="btn btn-primary" value="C">Completed</button>
             <button type="button" class="btn btn-success" value="R">Reading</button>
             <button type="button" class="btn btn-danger" value="D">Dropped</button>
             <button type="button" class="btn btn-secondary" value="PR">Plan to Read</button>
         </div>
-        <input class="form-control mt-4 me-2" id="search" type="search" placeholder="Search by Title" aria-label="Search">
+        <form method="GET" class="form-inline" id="form-search">
+            <input class="form-control mb-2" type="search" name="query" placeholder="Cari buku berdasarkan..." aria-label="Search">
+            <select class="form-control mb-2" name="search_type">
+                <option value="title">Title</option>
+                <option value="genre">Genre</option>
+                <option value="author">Author</option>
+            </select>
+            <button class="btn btn-success my-2 my-sm-0" type="submit">Find</button>
+        </form>
     </label>
 </div>
 
@@ -80,14 +89,10 @@
         thumbnail.setAttribute('src', imgHttps);
     }
 
-    async function getBookCollections(){
-        return fetch("{% url 'bookcollections:get_collections_json' %}").then((res) => res.json())
-    }
-
-    async function refreshCollections(){
+    // REFRESH KOLEKSI YANG DITAMPILKAN BERDASARKAN LIST COLLECTIONS
+    function refreshCollectionsItem(collections){
         document.getElementById("card-deck").innerHTML = ""
-        const collections = await getBookCollections()
-        
+
         let htmlString = ''
         collections.forEach((collection) => {
             htmlString += `
@@ -152,6 +157,16 @@
         getCover()
     }
 
+    async function getBookCollections(){
+        return fetch("{% url 'bookcollections:get_collections_json' %}").then((res) => res.json())
+    }
+
+    async function refreshCollections(){
+        const collections = await getBookCollections()
+        refreshCollectionsItem(collections)
+    }
+
+    // Menampilkan List Koleksi Pertama Kali
     refreshCollections()
 
     function addFilterHandler(){
@@ -175,26 +190,8 @@
         }
     }
 
+    // Menambah filter handler pada seluruh tombol status_filter
     addFilterHandler()
-
-    function filterByTitle(){
-        searchBar = document.getElementById('search')
-        searchBar.addEventListener('keyup',function(){
-            var keyWord = this.value.toLowerCase()
-            var cards = document.getElementsByClassName('card-container');
-            for (var i = 0; i < cards.length; i++){
-                var card = cards[i];
-                if (keyWord.length === 0 || card.getAttribute('data-title').toLowerCase().includes(keyWord) ){
-                    console.log("aa")
-                    card.style.display = 'block';
-                } else{
-                    card.style.display = 'none';
-                }
-            }
-        })
-    }
-
-    filterByTitle()
 
     function refreshNumberOfPage(id, isTen, isAdd,totalPage) {
         var pageElement = document.getElementById(`page-${id}`);
@@ -288,6 +285,20 @@
         return false
     }
 
+    document.querySelector('#form-search').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var query = document.querySelector('input[name="query"]').value;
+        var search_type = document.querySelector('select[name="search_type"]').value;
+
+        fetch(`/collections/get_collections_json?query=${encodeURIComponent(query)}&search_type=${encodeURIComponent(search_type)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // Include any other headers you need
+            },
+        }).then(response => response.json()).then(data => refreshCollectionsItem(data))
+    });
     
 </script>
   
