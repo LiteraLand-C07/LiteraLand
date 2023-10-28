@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from shared_models.models import Book
 from bookcollections.models import BookCollection, StatusBaca
-from django.http import HttpResponseRedirect,HttpResponse, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Avg
-import json
 from django.contrib.auth.decorators import login_required
+from .forms import SearchForm
 
 # Create your views here.
 def show_detail_buku(request,id):
@@ -63,16 +63,33 @@ def edit_collection(request,id):
 @login_required(login_url='/authentication/login')
 def show_collections(request):
     book_collections = BookCollection.objects.filter(user=request.user)
+    form = SearchForm()
+    
     context = {
         'book_collections':book_collections,
         'StatusBaca':StatusBaca,
         'user':request.user.username,
+        'form':form,
     }
 
     return render(request,'collections.html',context)
 
 def get_collections_json(request):
     collections = BookCollection.objects.filter(user=request.user)
+
+    if 'query' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            search_type = form.cleaned_data['search_type']
+            if search_type == 'title':
+                collections = collections.filter(book__title__icontains=query)
+            elif search_type == 'genre':
+                collections = collections.filter(book__genre__icontains=query)
+            elif search_type == 'author':
+                collections = collections.filter(book__author__icontains=query)
+
+
     data = []
     for collection in collections:
         item = {
