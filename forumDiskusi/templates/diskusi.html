@@ -146,7 +146,44 @@ textarea {
     padding-top: 600px; /* Anda bisa menyesuaikan ini sesuai kebutuhan */
 }
 
+.card:hover {
+    background-color: #f0f0f0; 
+    transition: background-color 0.3s; 
+}
+
+body.dark-mode {
+    background-color: #121212;
+    color: #FFF;
+}
+
+body.dark-mode .navbar {
+    background-color: #333;
+}
+
+body.dark-mode .card {
+    background-color: #333;
+    color: #FFF;
+}
+
+body.dark-mode .wrapper{
+    background-color: #333;
+    color: #FFF;
+}
+
+body.dark-mode .button-contactForm{
+    background-color: #5c5757;
+    color: #FFF;
+}
+
+.button-contactForm{
+    background-color: #121212;
+    color: #f0f0f0;
+    border-radius: 10px;
+    width: 25%;
+    margin-top: 10px;
+}
 </style>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="#">LiteraLand</a>
@@ -162,6 +199,10 @@ textarea {
                     <a class="nav-link" href="javascript:void(0);" onclick="goBack()">Back</a>
                 </li>
             </ul>
+            <div class="custom-control custom-switch ml-3">
+                <input type="checkbox" class="custom-control-input" id="darkSwitch">
+                <label class="custom-control-label" for="darkSwitch" style="color: #AAA;">Dark Mode</label>
+            </div>
         </div>
     </div>
 </nav>
@@ -171,21 +212,27 @@ textarea {
     <div class="row">
         <div class="col-12">
             <div class="wrapper">
-                <h3 class="display-4">Reviews for {{ book.title }}</h3>
+                <h3 class="display-4" >Reviews for {{ book.title }}</h3>
                 <strong class="text-success" id="review-res"></strong>
                 {% csrf_token %}
                 <form class="form-contact comment_form hide-comment-form" action="{% url 'forumDiskusi:ajax_add_review' book.id %}" id="reviewForm" method="POST">
                     {{review_form.review}}
                     {{review_form.star_rating}}
-                    
                     <div class="form-group">
                         <button type="submit" class="button button-contactForm" value='{{ book.pk }}' name="bookId">Submit</button>
-                        <button class="btn cancel">Cancel</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+</div>
+
+<div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <button id="darkModeToggle" class="btn btn-light">Dark Mode</button>
+        </li>
+    </ul>
 </div>
 
     <!-- All Review section -->
@@ -298,6 +345,7 @@ textarea {
                 }
             })
         })
+
         function goBack() {
             window.history.back();
         }
@@ -305,6 +353,16 @@ textarea {
         $(".recommendation .btn").on("click", function() {
             let recommended = $(this).data("value");
             $("input.recommendation-checkbox").prop("checked", recommended);
+        });
+
+        $(document).ready(function(){
+            $("#darkSwitch").on("change", function(){
+                if ($(this).is(":checked")) {
+                    $("body").addClass("dark-mode");
+                } else {
+                    $("body").removeClass("dark-mode");
+                }
+            });
         });
     </script>
 {% endblock %}
