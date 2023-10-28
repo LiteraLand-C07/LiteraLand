@@ -30,16 +30,15 @@
     <li class="nav-item">
         <a class="nav-link my-2 my-lg-0" href="">Recommendation</a>
     </li>
-    <!-- DISPLAY IF IN GUEST MODE -->
     <li class="nav-item">
-        <a class="nav-link my-2 my-lg-0" href="">Logout</a>
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:logout' %}">Logout</a>
     </li>
 {% endblock nav %}
 
 {% block content %}
 
 <!-- HEADER HALAMAN  -->
-<h1 class="text-white text-center mt-4"><i class="bi bi-folder me-2"></i>MyCollections</h1>
+<h1 class="text-white text-center mt-4"><i class="bi bi-folder me-2"></i>{{user}}-Collections</h1>
 <div class="container my-4">
 <div class="mb-3 d-flex align-items-center">
     <label class="me-3 mb-0 text-white">
@@ -102,7 +101,7 @@
                             <div class="card-body">
                                 <h5 class="card-title text-truncate mb-3"><a class="text-decoration-none text-white" href="/collections/detail_buku/${collection.book}/">${ collection.title }</a></h5>
                                 <p class="card-text"><i class="bi bi-pencil-fill me-1"></i>Author : ${ collection.author }</p>
-                                <p class="card-text"><i class="bi bi-film me-2"></i>Genre   : ${collection.genre}</p>
+                                <p class="card-text text-truncate"><i class="bi bi-film me-2"></i>Genre   : ${collection.genre}</p>
                                 <p class="card-text">
                                     <i class="bi bi-bookmark-fill me-1"></i> Page     : 
                                     <span id="page-${collection.pk}" class="fw-bolder"> ${collection.current_page}</span> / ${collection.page_count}

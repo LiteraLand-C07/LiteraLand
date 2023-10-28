@@ -27,25 +27,33 @@
         <a class="nav-link my-2 my-lg-0" href="">Browse Book</a>
     </li>
     <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="/collections/">MyCollections</a>
+    </li>
+
+    {% if user.is_authenticated %}
+    <li class="nav-item">
         <a class="nav-link my-2 my-lg-0" href="">Recommendation</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link my-2 my-lg-0" href="/collections/">MyCollections</a>
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:logout' %}">Logout</a>
     </li>
-    <!-- DISPLAY IF IN GUEST MODE -->
+
+    {% else %}
     <li class="nav-item">
-        <a class="nav-link my-2 my-lg-0" href="">Login</a>
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:login' %}?next={{ request.path }}"">Login</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link my-2 my-lg-0" href="">Register</a>
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:register' %}">Register</a>
     </li>
+    {% endif %}
+    
 {% endblock nav %}
 
 {% block content %}
 
 <!-- DISPLAY BOOK INFORMATION IN  CARD LAYOUT-->
 <div class="container-fluid mt-4 mb-4">
-    <div class="card p-3 book text-bg-dark p-3 shadow-lg rounded" data-isbn="{{book.ISBN}}" book-id="{{book.pk}}" book-page="{{book.page_count}}">
+    <div class="card p-3 book text-bg-dark p-3 shadow-lg rounded" data-isbn="{{book.ISBN}}" book-id="{{book.pk}}" book-page="{{book.page_count}}" is-login="{{user.is_authenticated}}">
         <div class="row g-2">
             <div class="col-md-4">
                 <img src="" alt="Book Cover" class="img-fluid thumbnail rounded">
@@ -128,95 +136,100 @@
     }
 
     async function refreshPage(){
-        document.getElementById('modal-header').innerHTML = ""
-        document.getElementById('rating').innerHTML = ""
-        document.getElementById('status_baca').innerHTML = ""
-        document.getElementById('modal-footer').innerHTML = ""
-        document.getElementById('button-collection').innerHTML = ""
-        var idBook = document.querySelector('.book').getAttribute('book-id')
+        var is_login = document.querySelector('.book').getAttribute('is-login')
 
-        const books = await getBookCollection()
-        var statusBacaChoices = [
-            {value: 'C', label: 'Completed'},
-            {value: 'R', label: 'Reading'},
-            {value: 'PR', label: 'Plan to Read'},
-            {value: 'D', label: 'Dropped'}
-        ];
+        if (is_login){
 
-        let modalHeader = ''
-        let ratingHTML = ''
-        let statusHTML = ''
-        let modalFooter = ''
-        let buttonHTML = ''
+            document.getElementById('modal-header').innerHTML = ""
+            document.getElementById('rating').innerHTML = ""
+            document.getElementById('status_baca').innerHTML = ""
+            document.getElementById('modal-footer').innerHTML = ""
+            document.getElementById('button-collection').innerHTML = ""
+            var idBook = document.querySelector('.book').getAttribute('book-id')
 
-        if (books.length == 0){
-            modalHeader += `
-            <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Add to MyCollection</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            `
+            const books = await getBookCollection()
+            var statusBacaChoices = [
+                {value: 'C', label: 'Completed'},
+                {value: 'R', label: 'Reading'},
+                {value: 'PR', label: 'Plan to Read'},
+                {value: 'D', label: 'Dropped'}
+            ];
 
-            ratingHTML += '<option value="0">Select Rating:</option>'
-            for (var i = 1; i <= 10; i++){
-                ratingHTML += `<option value="${ i }">${ i }</option>`
+            let modalHeader = ''
+            let ratingHTML = ''
+            let statusHTML = ''
+            let modalFooter = ''
+            let buttonHTML = ''
+
+            if (books.length == 0){
+                modalHeader += `
+                <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Add to MyCollection</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                `
+
+                ratingHTML += '<option value="0">Select Rating:</option>'
+                for (var i = 1; i <= 10; i++){
+                    ratingHTML += `<option value="${ i }">${ i }</option>`
+                }
+
+                statusHTML += `<option value="">Select Status:</option>`
+                for (var i = 0; i < statusBacaChoices.length; i++) {
+                    var choice = statusBacaChoices[i];
+                    var value = choice.value;
+                    var label = choice.label;
+                    statusHTML += `<option value="${value}"}>${label}</option>`
+                }
+
+                modalFooter += `
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="addCollection()">Add</button>
+                `
+
+                buttonHTML += `
+                <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal""><i class="bi bi-plus-circle me-1"></i>Add to Collections</button>
+                <a class="btn btn-outline-light" href="/forumDiskusi/book_reviews/${idBook}/"><i class="bi bi-chat-dots me-1"></i>Review Book</a>
+                `
+
+            } else {
+                const book = books[0];  
+
+                modalHeader += `
+                <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Edit Collection</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                `
+                
+                ratingHTML += '<option value="0">Select Rating:</option>'
+                for (var i = 1; i <= 10; i++){
+                    ratingHTML += `<option id="rating-${i}" value="${ i }"  ${i == book.fields.rating ? 'selected' : ''}>${ i }</option>`
+                }
+
+                document.getElementById('current_page').setAttribute("value",book.fields.current_page)
+
+                for (var i = 0; i < statusBacaChoices.length; i++) {
+                    var choice = statusBacaChoices[i];
+                    var value = choice.value;
+                    var label = choice.label;
+                    statusHTML += `<option value="${value}" ${value == book.fields.status_baca ? 'selected' : ''}>${label}</option>`
+                }
+
+                modalFooter += `
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="editCollection()">Edit</button>
+                `
+
+                buttonHTML += `
+                <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal""><i class="bi bi-pencil-square me-1"></i>Edit Collection</button>
+                <a class="btn btn-outline-light" href="/forumDiskusi/book_reviews/${idBook}/"><i class="bi bi-chat-dots me-1"></i>Review Book</a>
+                `
+        
             }
 
-            statusHTML += `<option value="">Select Status:</option>`
-            for (var i = 0; i < statusBacaChoices.length; i++) {
-                var choice = statusBacaChoices[i];
-                var value = choice.value;
-                var label = choice.label;
-                statusHTML += `<option value="${value}"}>${label}</option>`
-            }
-
-            modalFooter += `
-            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="addCollection()">Add</button>
-            `
-
-            buttonHTML += `
-            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal""><i class="bi bi-plus-circle me-1"></i>Add to Collections</button>
-            <a class="btn btn-outline-light" href="/forumDiskusi/book_reviews/${idBook}/"><i class="bi bi-chat-dots me-1"></i>Review Book</a>
-            `
-
-        } else {
-            const book = books[0];  
-
-            modalHeader += `
-            <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Edit Collection</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            `
-            
-            ratingHTML += '<option value="0">Select Rating:</option>'
-            for (var i = 1; i <= 10; i++){
-                ratingHTML += `<option id="rating-${i}" value="${ i }"  ${i == book.fields.rating ? 'selected' : ''}>${ i }</option>`
-            }
-
-            document.getElementById('current_page').setAttribute("value",book.fields.current_page)
-
-            for (var i = 0; i < statusBacaChoices.length; i++) {
-                var choice = statusBacaChoices[i];
-                var value = choice.value;
-                var label = choice.label;
-                statusHTML += `<option value="${value}" ${value == book.fields.status_baca ? 'selected' : ''}>${label}</option>`
-            }
-
-            modalFooter += `
-            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="editCollection()">Edit</button>
-            `
-
-            buttonHTML += `
-            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal""><i class="bi bi-pencil-square me-1"></i>Edit Collection</button>
-            <a class="btn btn-outline-light" href="/forumDiskusi/book_reviews/${idBook}/"><i class="bi bi-chat-dots me-1"></i>Review Book</a>
-            `
-    
+            document.getElementById('modal-header').innerHTML = modalHeader;
+            document.getElementById('rating').innerHTML = ratingHTML
+            document.getElementById('status_baca').innerHTML = statusHTML
+            document.getElementById('modal-footer').innerHTML = modalFooter
+            document.getElementById('button-collection').innerHTML = buttonHTML
         }
-
-        document.getElementById('modal-header').innerHTML = modalHeader;
-        document.getElementById('rating').innerHTML = ratingHTML
-        document.getElementById('status_baca').innerHTML = statusHTML
-        document.getElementById('modal-footer').innerHTML = modalFooter
-        document.getElementById('button-collection').innerHTML = buttonHTML
     }
 
     refreshPage()
