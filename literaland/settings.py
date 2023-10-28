@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'bookcollections',
     'forumDiskusi',
     'browseBooks',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
