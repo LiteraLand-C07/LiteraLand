@@ -214,6 +214,8 @@ body.dark-mode .button-contactForm{
             <div class="wrapper">
                 <h3 class="display-4" >Reviews for {{ book.title }}</h3>
                 <strong class="text-success" id="review-res"></strong>
+                <br/><strong class="text-success" id="review-res2"></strong>
+                <br/><strong class="text-success" id="review-res3"></strong>
                 {% csrf_token %}
                 <form class="form-contact comment_form hide-comment-form" action="{% url 'forumDiskusi:ajax_add_review' book.id %}" id="reviewForm" method="POST">
                     {{review_form.review}}
@@ -300,6 +302,8 @@ body.dark-mode .button-contactForm{
                     
                     if(res.bool == true){
                         $("#review-res").html("Review added successfully")
+                        $("#review-res2").html("If you want to delete your current review, please refresh the page")
+                        $("#review-res3").html("your current review is located in the last position after refresh the page")
                         $(".hide-comment-form").hide()
 
                         let _html = '<div class="col-md-4 mb-4">'; 
@@ -313,8 +317,9 @@ body.dark-mode .button-contactForm{
                             for(let i = 1; i <= res.context.star_rating; i++) {
                                 _html += '<i class="fas fa-star text-warning"></i>';
                             }
-                            
+
                             _html += '<p>' + res.context.review + '</p>'; 
+                            _html += '</form>';
                             _html += '</div>'; 
                             _html += '</div>'; 
                             _html += '</div>'; 
