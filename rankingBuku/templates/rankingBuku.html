@@ -26,26 +26,40 @@
         const booklists = await getListBooks();
 
         let htmlString = '<div class="row">';
-        booklists.forEach((listbook) => {
-            const imageUrl = "{% if listbook.fields.image %}{{ listbook.fields.image.url }}{% else %}/static/default_image.png{% endif %}";
+        booklists.forEach((booklist) => {
+            const imageUrl = "{% if booklist.fields.image %}{{ booklist.fields.image.url }}{% else %}/static/default_image.png{% endif %}";
             htmlString += `
             <div class="col-md-3">
-                <div class="card custom-card">
-                    <img id="cover-${listbook.pk}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover; src="${listbook.fields.image}" alt="List Image" width="200">
+                <div class="card custom-card" data-list-id="${booklist.pk}"> <!-- Set the data-list-id attribute here -->
+                    <img id="cover-${booklist.pk}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover; src="${booklist.fields.image}" alt="List Image" width="200">
                     <div class="card-body">
-                        <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px;">${listbook.fields.name}</h5>
-                        <p class="card-text" style="font-weight: 400;">${listbook.fields.description}</p>
-                        <p class="card-text" style="font-weight: 400;">${listbook.fields.books}</p>
+                        <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px;">${booklist.fields.name}</h5>
+                        <p class="card-text" style="font-weight: 400;">${booklist.fields.description}</p>
+                        <p class="card-text" style="font-weight: 400;">${booklist.fields.books}</p>
                     </div>
                 </div>
             </div>
             `;
         });
         document.getElementById('card_deck').innerHTML = htmlString;
+        htmlString += '</div>';
+
+        const cards = document.querySelectorAll('.custom-card');
+        cards.forEach((card) => {
+            card.addEventListener('click', redirectToDetailPage);
+        });
+    }
+
+    async function redirectToDetailPage(event) {
+        // Get the list ID from the clicked card's data attribute
+        const listId = event.currentTarget.dataset.listId;
         
+        // Redirect to the detail page using the list ID
+        window.location.href = `{% url 'list_book_detail' %}?id=${listId}`;
     }
 
     refreshListBooks()
+    
 </script>
 
 <a href="{% url 'create_book_list' %}" class="btn btn-primary">Create Book List</a>

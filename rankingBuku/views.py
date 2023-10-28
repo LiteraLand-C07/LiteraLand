@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from rankingBuku.models import ListBook
 from rankingBuku.forms import ListBookForm
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
@@ -45,3 +45,23 @@ def create_book_list(request):
 def get_book_lists_json(request):
     booklists = ListBook.objects.filter(access__icontains='public')
     return HttpResponse(serializers.serialize('json', booklists))
+
+def get_book_list_byid(request, id):
+    booklists = ListBook.objects.filter(pk=id)
+    return HttpResponse(serializers.serialize('json', booklists))
+
+def list_book_detail(request):
+    list_id = request.GET.get('id')  # Get the list ID from the query parameter
+    listbook = ListBook.objects.get(pk=list_id)
+    context = {'listbook': listbook}
+    return render(request, 'list_book_detail.html', context)
+
+@csrf_exempt
+def delete_collection(request,id):
+    if request.method == 'DELETE':
+        listbook = ListBook.objects.get(pk=id)
+        listbook.delete()
+
+        return HttpResponse(b"DELETED",status=201)
+    
+    return HttpResponseNotFound()
