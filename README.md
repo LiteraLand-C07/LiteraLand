@@ -31,3 +31,5 @@ LiteraLand adalah aplikasi koleksi buku berbasis web yang memungkinkan pengguna 
 - Guest (User yang belum memiliki akun dan belum login hanya dapat melihat i nformasi terkini yang sudah disediakan oleh admin, serta dia hanya dapat melihat urutan rank dari buku yang ada)
 - User (Pengguna yang sudah terautentifikasi bisa mengakses hampir semua fitur kecuali memberikan/mempublish informasi dan menghapus feedback / review dari user lain, dan menghapus forum)
 - Admin (Pengguna yang mempunyai akses ke semua fitur seperti : dapat  memberikan/mempublish informasi dan menghapus feedback / review dari user lain, dan menghapus forum)
+>>>>>>> 94a170257182648d599ab916cf9b7dbbb8bec8d9
+
