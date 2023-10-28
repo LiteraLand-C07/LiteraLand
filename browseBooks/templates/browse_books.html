@@ -24,7 +24,9 @@
         {% for book in books %}
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card h-100 shadow d-flex">
-                    <img id="cover-{{ book.id }}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover;">
+                    <img data-isbn="{{ book.ISBN }}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover;">
+                    <!-- <img class="card-img-left thumbnail" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover;" data-isbn="{{ book.ISBN }}"> -->
+                    <!-- <img id="cover-{{ book.id }}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover;"> -->
                     <div class="card-body">
                         <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px;">{{ book.title }}</h5>
                         <p class="card-text" style="font-weight: 400;">{{ book.author }}</p>
@@ -32,7 +34,7 @@
                 </div>
             </div>
             <script>
-                getCover('{{ book.ISBN }}', 'cover-{{ book.id }}');
+                getCover('{{ book.ISBN }}');
             </script>
         {% empty %}
             <div class="col-12">
@@ -44,21 +46,39 @@
 {% endblock %}
 
 <div class="container mt-4">
-    <h2>Request Buku</h2>
-    <p>Jika Anda tidak menemukan buku yang Anda cari, Anda dapat merequest buku di sini.</p>
+    <h2>Book request</h2>
+    <p>If you cannot find the book you are looking for, you can request a book here.</p>
     <form>
         <div class="mb-3">
-            <label for="bookTitle" class="form-label">Judul Buku</label>
-            <input type="text" class="form-control" id="bookTitle" placeholder="Masukkan judul buku">
+            <label for="bookTitle" class="form-label">Book title</label>
+            <input type="text" class="form-control" id="bookTitle" placeholder="Insert book title">
         </div>
         <div class="mb-3">
-            <label for="bookAuthor" class="form-label">Penulis Buku</label>
-            <input type="text" class="form-control" id="bookAuthor" placeholder="Masukkan nama penulis">
+            <label for="bookAuthor" class="form-label">Author</label>
+            <input type="text" class="form-control" id="bookAuthor" placeholder="Insert author">
         </div>
         <div class="mb-3">
-            <label for="additionalInfo" class="form-label">Informasi Tambahan (Opsional)</label>
-            <textarea class="form-control" id="additionalInfo" rows="3" placeholder="Tambahkan informasi tambahan di sini"></textarea>
+            <label for="additionalInfo" class="form-label">Additional information (Optional)</label>
+            <textarea class="form-control" id="additionalInfo" rows="3" placeholder="Insert additional information here"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Request Buku</button>
+        <button type="submit" class="btn btn-primary">Book request</button>
     </form>
 </div>
+
+<script>
+    function getCover(isbn) {
+        const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn;
+        fetch(url, {
+            method: 'GET',
+        }).then(response => response.json())
+            .then(response => {
+                if (response.items && response.items.length > 0) {
+                    var item = response.items[0];
+                    var thumb = item.volumeInfo.imageLinks.thumbnail;
+                    let imgZoom = thumb.replace('zoom=1', 'zoom=6');
+                    let imgHttps = imgZoom.replace('http', 'https');
+                    document.querySelector(`img[data-isbn="${isbn}"]`).setAttribute('src', imgHttps);
+                }
+            });
+    }
+</script>
