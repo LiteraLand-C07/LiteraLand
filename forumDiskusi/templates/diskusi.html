@@ -146,7 +146,45 @@ textarea {
     padding-top: 600px; /* Anda bisa menyesuaikan ini sesuai kebutuhan */
 }
 
+.card:hover {
+    background-color: #f0f0f0; 
+    transition: background-color 0.3s; 
+}
+
+body.dark-mode {
+    background-color: #121212;
+    color: #FFF;
+}
+
+body.dark-mode .navbar {
+    background-color: #333;
+}
+
+body.dark-mode .card {
+    background-color: #333;
+    color: #FFF;
+}
+
+body.dark-mode .wrapper{
+    background-color: #333;
+    color: #FFF;
+}
+
+body.dark-mode .button-contactForm{
+    background-color: #5c5757;
+    color: #FFF;
+}
+
+.button-contactForm{
+    background-color: #121212;
+    color: #f0f0f0;
+    border-radius: 10px;
+    width: 25%;
+    margin-top: 10px;
+}
+
 </style>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="#">LiteraLand</a>
@@ -159,9 +197,13 @@ textarea {
                     <a class="nav-link" href="{% url 'forumDiskusi:browse_books' %}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="javascript:void(0);" onclick="goBack()">Back</a>
+                    <a class="nav-link" href="{% url 'forumDiskusi:show_detail_buku' book.id %}" >Back</a>
                 </li>
             </ul>
+            <div class="custom-control custom-switch ml-3">
+                <input type="checkbox" class="custom-control-input" id="darkSwitch">
+                <label class="custom-control-label" for="darkSwitch" style="color: #AAA;">Dark Mode</label>
+            </div>
         </div>
     </div>
 </nav>
@@ -171,16 +213,16 @@ textarea {
     <div class="row">
         <div class="col-12">
             <div class="wrapper">
-                <h3 class="display-4">Reviews for {{ book.title }}</h3>
+                <h3 class="display-4" >Reviews for {{ book.title }}</h3>
                 <strong class="text-success" id="review-res"></strong>
+                <br/><strong class="text-success" id="review-res2"></strong>
+                <br/><strong class="text-success" id="review-res3"></strong>
                 {% csrf_token %}
                 <form class="form-contact comment_form hide-comment-form" action="{% url 'forumDiskusi:ajax_add_review' book.id %}" id="reviewForm" method="POST">
                     {{review_form.review}}
                     {{review_form.star_rating}}
-                    
                     <div class="form-group">
                         <button type="submit" class="button button-contactForm" value='{{ book.pk }}' name="bookId">Submit</button>
-                        <button class="btn cancel">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -188,16 +230,29 @@ textarea {
     </div>
 </div>
 
+<div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <button id="darkModeToggle" class="btn btn-light">Dark Mode</button>
+        </li>
+    </ul>
+</div>
+
     <!-- All Review section -->
 <div class="container mt-5 all-review-container">
     <h1>All Review</h1>
+    <div>
+        <a href="?star_filter" class="btn btn-outline-primary">All Ratings</a>
+        <a href="?star_filter=lte3" class="btn btn-outline-primary">Rating ⭐ 3 or Less</a>
+        <a href="?star_filter=gt3" class="btn btn-outline-primary">Rating ⭐ Above 3</a>
+    </div>
     <div class="row">
         {% for review in reviews %}
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">{{ review.user.username }}</h5>
-                    <p>you give {{ review.star_rating }} stars to this book</p>
+                    <p class="card-text">you give {{ review.star_rating }} stars to this book</p>
                     <p class="card-text">{{ review.date|date:"M d, Y" }}</p>
                     <p>{{ review.review }}</p>
                     <form method="post" action="{% url 'forumDiskusi:delete_review' book.id %}">
@@ -253,24 +308,27 @@ textarea {
                     
                     if(res.bool == true){
                         $("#review-res").html("Review added successfully")
+                        $("#review-res2").html("If you want to delete your current review, please refresh the page")
+                        $("#review-res3").html("your current review is located in the last position after refresh the page")
                         $(".hide-comment-form").hide()
 
-                        let _html = '<div class="col-md-4 mb-4">'; // Ini membungkus setiap card review
+                        let _html = '<div class="col-md-4 mb-4">'; 
                             _html += '<div class="card">';
                             _html += '<div class="card-body">';
-                            _html += '<h5 class="card-title">' + res.context.user + '</h5>'; // Menampilkan nama user
-                            _html += '<p class="card-text">' + time + '</p>'; // Menampilkan tanggal
+                            _html += '<h5 class="card-title">' + res.context.user + '</h5>'; 
+                            _html += '<p class="card-text">you give ' + res.context.star_rating +' stars to this book</p>'
+                            _html += '<p class="card-text">' + time + '</p>'; 
 
-                            // Iterasi untuk menampilkan bintang rating
+                            
                             for(let i = 1; i <= res.context.star_rating; i++) {
                                 _html += '<i class="fas fa-star text-warning"></i>';
                             }
 
-                            _html += '<p>' + res.context.review + '</p>'; // Menampilkan teks review
-                            _html += '</div>'; // Menutup card-body
-                            _html += '</div>'; // Menutup card
-                            _html += '</div>'; // Menutup col-md-4 mb-4
-
+                            _html += '<p>' + res.context.review + '</p>'; 
+                            _html += '</form>';
+                            _html += '</div>'; 
+                            _html += '</div>'; 
+                            _html += '</div>'; 
                             $(".all-review-container .row").prepend(_html);
                     }
                 }})
@@ -298,13 +356,20 @@ textarea {
                 }
             })
         })
-        function goBack() {
-            window.history.back();
-        }
 
         $(".recommendation .btn").on("click", function() {
             let recommended = $(this).data("value");
             $("input.recommendation-checkbox").prop("checked", recommended);
+        });
+
+        $(document).ready(function(){
+            $("#darkSwitch").on("change", function(){
+                if ($(this).is(":checked")) {
+                    $("body").addClass("dark-mode");
+                } else {
+                    $("body").removeClass("dark-mode");
+                }
+            });
         });
     </script>
 {% endblock %}
