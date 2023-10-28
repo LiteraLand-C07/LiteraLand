@@ -145,6 +145,7 @@ textarea {
 .container.mt-5.all-review-container {
     padding-top: 600px; /* Anda bisa menyesuaikan ini sesuai kebutuhan */
 }
+
 </style>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
@@ -176,7 +177,7 @@ textarea {
                 <form class="form-contact comment_form hide-comment-form" action="{% url 'forumDiskusi:ajax_add_review' book.id %}" id="reviewForm" method="POST">
                     {{review_form.review}}
                     {{review_form.star_rating}}
-
+                    
                     <div class="form-group">
                         <button type="submit" class="button button-contactForm" value='{{ book.pk }}' name="bookId">Submit</button>
                         <button class="btn cancel">Cancel</button>
@@ -196,6 +197,7 @@ textarea {
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">{{ review.user.username }}</h5>
+                    <p>you give {{ review.star_rating }} stars to this book</p>
                     <p class="card-text">{{ review.date|date:"M d, Y" }}</p>
                     <p>{{ review.review }}</p>
                     <form method="post" action="{% url 'forumDiskusi:delete_review' book.id %}">
@@ -233,7 +235,7 @@ textarea {
                 }
             });
         });
-        
+
         $("#reviewForm").submit(function(e){
             e.preventDefault();
             
@@ -299,5 +301,10 @@ textarea {
         function goBack() {
             window.history.back();
         }
+
+        $(".recommendation .btn").on("click", function() {
+            let recommended = $(this).data("value");
+            $("input.recommendation-checkbox").prop("checked", recommended);
+        });
     </script>
 {% endblock %}
