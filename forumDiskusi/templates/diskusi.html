@@ -244,7 +244,7 @@ body.dark-mode .button-contactForm{
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">{{ review.user.username }}</h5>
-                    <p>you give {{ review.star_rating }} stars to this book</p>
+                    <p class="card-text">you give {{ review.star_rating }} stars to this book</p>
                     <p class="card-text">{{ review.date|date:"M d, Y" }}</p>
                     <p>{{ review.review }}</p>
                     <form method="post" action="{% url 'forumDiskusi:delete_review' book.id %}">
@@ -302,22 +302,22 @@ body.dark-mode .button-contactForm{
                         $("#review-res").html("Review added successfully")
                         $(".hide-comment-form").hide()
 
-                        let _html = '<div class="col-md-4 mb-4">'; // Ini membungkus setiap card review
+                        let _html = '<div class="col-md-4 mb-4">'; 
                             _html += '<div class="card">';
                             _html += '<div class="card-body">';
-                            _html += '<h5 class="card-title">' + res.context.user + '</h5>'; // Menampilkan nama user
-                            _html += '<p class="card-text">' + time + '</p>'; // Menampilkan tanggal
+                            _html += '<h5 class="card-title">' + res.context.user + '</h5>'; 
+                            _html += '<p class="card-text">you give ' + res.context.star_rating +' stars to this book</p>'
+                            _html += '<p class="card-text">' + time + '</p>'; 
 
-                            // Iterasi untuk menampilkan bintang rating
+                            
                             for(let i = 1; i <= res.context.star_rating; i++) {
                                 _html += '<i class="fas fa-star text-warning"></i>';
                             }
-
-                            _html += '<p>' + res.context.review + '</p>'; // Menampilkan teks review
-                            _html += '</div>'; // Menutup card-body
-                            _html += '</div>'; // Menutup card
-                            _html += '</div>'; // Menutup col-md-4 mb-4
-
+                            
+                            _html += '<p>' + res.context.review + '</p>'; 
+                            _html += '</div>'; 
+                            _html += '</div>'; 
+                            _html += '</div>'; 
                             $(".all-review-container .row").prepend(_html);
                     }
                 }})
