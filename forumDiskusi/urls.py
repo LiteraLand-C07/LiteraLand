@@ -1,5 +1,5 @@
 from django.urls import path
-from forumDiskusi.views import book_reviews, hello,ajax_add_review, delete_review
+from forumDiskusi.views import book_reviews, ajax_add_review, delete_review
 from bookcollections.views import show_detail_buku
 from browseBooks.views import browse_books
 

@@ -20,9 +20,6 @@ def book_reviews(request, book_id):
     context = {'book': book, 'reviews': reviews, 'review_form': review_form, 'current_user': request.user}
     return render(request, 'diskusi.html', context)
 
-def hello(request):
-    return render(request,"hallo.html")
-
 @csrf_exempt
 def ajax_add_review(request, pid):
     book = Book.objects.get(pk=pid)
