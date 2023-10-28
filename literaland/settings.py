@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'forumDiskusi',
     'administrator',
     'browseBooks',
-    'widget_tweaks',
-
 ]
 
 MIDDLEWARE = [

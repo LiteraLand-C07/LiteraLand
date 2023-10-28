@@ -8,13 +8,84 @@
 {% endblock link %}
 
 {% block content %}
+<div class="modal fade" id="messageModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Book Request</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body"  id="ModalTitle">
+                <form id="BookReqForm">
+                    <div class="mb-3">
+                        <label for="user" class="col-form-label">Requested by: </label>
+                        <input type="text" class="form-control" id="user" name="user" readonly></input>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="col-form-label">Title: </label>
+                        <input type="text" class="form-control" id="title" name="title" readonly></input>
+                    </div>
+                    <div class="mb-3">
+                        <label for="author" class="col-form-label">Author: </label>
+                        <input type="text" class="form-control" id="author" name="author" readonly></input>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="col-form-label">Description: </label>
+                        <textarea rows="5" class="form-control" id="description" name="description" readonly></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary mx-auto" onclick="copyToForm()">Copy To Form</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-3 px-0">
-            <div class="container-fluid bg-dark-subtle mx-0" style="height: calc(100vh - 56px); overflow: auto;color: white;">
+            <div class="container-fluid bg-dark-subtle mx-0 px-0" style="height: calc(100vh - 56px); overflow: auto;">
+                <div id="inbox" class="container-fluid">
+                    {% for request in reqs %}
+                    <div class="card my-3" data="{{request.pk}}" data-bs-toggle="modal" data-bs-target="#messageModal">
+                        <div class="card-header">
+                            <p class="card-text">{{request.created_at}}</p>
+                        </div>
+                        <div class="card-body">
+                            {{request.title}}
+                            <form id="Form{{request.pk}}">
+                                <input type="hidden" name="user" value="{{request.user}}">
+                                <input type="hidden" name="title" value="{{request.title}}">
+                                <input type="hidden" name="author" value="{{request.author}}">
+                                <input type="hidden" name="description" value="{{request.description}}">
+                                <input type="hidden" name="date" value="{{request.created_at}}">
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <script>
+                        $(".card").click(function(){
+                            const id = $(this).attr("data")
+                            setModal(id)
+                        })
 
+                        $(".card").mouseenter(function(){
+                            $(this).addClass("bg-secondary-subtle");
+                        })
+
+                        $(".card").mouseleave(function(){
+                            $(this).removeClass("bg-secondary-subtle");
+                        })
+                    </script>
+                </div>
+
+                <div id="log" class="container-fluid">
+                    
+                </div>
             </div>
         </div>
+
         <div class="col-9 px-0">
             <div class="container-fluid px-4" style="height: calc(100vh - 56px); overflow: auto;">
                 <div class="card mx-auto my-3 bg-secondary-subtle">
@@ -88,7 +159,23 @@
             }
         })
     }
+    function setModal(formId){
+        const data = new FormData(document.querySelector(`#Form${formId}`))
+        $("#BookReqForm #user").val(data.get("user"))
+        $("#BookReqForm #title").val(data.get("title"))
+        $("#BookReqForm #author").val(data.get("author"))
+        $("#BookReqForm #description").val(data.get("description"))
+    }
+    function copyToForm(){
+        const data = new FormData(document.querySelector("#BookReqForm"))
+        console.log(data)
+        $("#id_title").val(data.get("title"))
+        $("#id_author").val(data.get("author"))
+        $("#id_description").val(data.get("description"))
+    }
+
     $("#invalid").hide()
     $("#exist").hide()
+    $("#log").hide()
 </script>
 {% endblock content %}
