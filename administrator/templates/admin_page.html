@@ -11,21 +11,23 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-3 px-0">
-            <div class="container-fluid bg-dark mx-0" style="height: 100vh; overflow: auto;color: white;">
+            <div class="container-fluid bg-dark-subtle mx-0" style="height: calc(100vh - 56px); overflow: auto;color: white;">
 
             </div>
         </div>
         <div class="col-9 px-0">
-            <div class="container-fluid px-4" style="height: 100vh; overflow: auto;">
-                <div class="card mx-auto my-3">
+            <div class="container-fluid px-4" style="height: calc(100vh - 56px); overflow: auto;">
+                <div class="card mx-auto my-3 bg-secondary-subtle">
                     <div class="card body bg-secondary-subtle">
-                        <h4 class="card-title ms-3 mt-3">Add Book to Database</h4>
-                        <form class="mx-3 my-2" id="CreateBookForm">
+                        <h4 class="card-title mx-auto mt-3">Add Book To Database</h4>
+                        <form class="mx-3 my-3" id="CreateBookForm">
                             {% csrf_token %}
                             <table>
                                 {{form.as_table}}
                             </table>
                         </form>
+                        <p class="mx-auto" id="invalid">Form Invalid</p>
+                        <p class="mx-auto" id="exist">Book Already Exist</p>
                         <script>
                             $('table').css("width", "100%")
                             $("table label").attr("class", "col-form-label")
@@ -34,9 +36,59 @@
                             $("table textarea").attr("rows", "5")
                         </script>
                     </div>
+                    <div class="card footer bg-secondary-subtle">
+                        <button type="button" class="btn btn-primary" onclick="addQueue()">Add To Queue</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+    function clearForm(){
+        const form = document.getElementById('CreateBookForm')
+        form.reset()
+    }
+    function addQueue(){
+        const data = new FormData(document.querySelector("#CreateBookForm"))
+        const ISBN = data.get("ISBN")
+        const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + ISBN
+        fetch(url, {
+                method: 'GET',
+        }).then(response => response.json()).then(books=> {
+            $("#invalid").hide()
+            $("#exist").hide()
+
+            //Jika isbn tidak ditemukan
+            if (books.totalItems == 0){
+                $("#invalid").show()
+            }
+            else {
+                fetch("{% url 'administrator:add_queue' %}", {
+                    method: "POST",
+                    body: data,
+                }).then(response => {
+                    //Jika buku dapat ditambahkan ke database
+                    if (response.status == 200){
+                        clearForm()
+                    }
+                    else {
+                        response.text().then(message=>{
+                            //Jika form tidak valid
+                            if (message == "Form Not Valid"){
+                                $("#invalid").show()
+                            }
+                            //Jika buku sudah ada
+                            else {
+                                $("#exist").show()
+                            }
+                        })
+                    }
+                })
+            }
+        })
+    }
+    $("#invalid").hide()
+    $("#exist").hide()
+</script>
 {% endblock content %}
