@@ -15,7 +15,15 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def book_reviews(request, book_id):
     book = Book.objects.get(pk=book_id)
-    reviews = BookReview.objects.filter(book=book_id).select_related('user') # Getting usernames and reviews
+    star_filter = request.GET.get('star_filter', None)
+
+    if star_filter == 'lte3':
+        reviews = BookReview.objects.filter(book=book, star_rating__lte=3).select_related('user')
+    elif star_filter == 'gt3':
+        reviews = BookReview.objects.filter(book=book, star_rating__gt=3).select_related('user')
+    else:
+        reviews = BookReview.objects.filter(book=book).select_related('user')
+
     review_form = BookReviewForm()
     context = {'book': book, 'reviews': reviews, 'review_form': review_form, 'current_user': request.user}
     return render(request, 'diskusi.html', context)
@@ -59,3 +67,4 @@ def delete_review(request, book_id):
                 return JsonResponse({'status': 'fail', 'message': 'Permission denied'})
         except BookReview.DoesNotExist:
             return JsonResponse({'status': 'fail', 'message': 'Review does not exist'})
+        

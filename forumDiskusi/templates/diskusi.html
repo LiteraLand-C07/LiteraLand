@@ -182,6 +182,7 @@ body.dark-mode .button-contactForm{
     width: 25%;
     margin-top: 10px;
 }
+
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -196,7 +197,7 @@ body.dark-mode .button-contactForm{
                     <a class="nav-link" href="{% url 'forumDiskusi:browse_books' %}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="javascript:void(0);" onclick="goBack()">Back</a>
+                    <a class="nav-link" href="{% url 'forumDiskusi:show_detail_buku' book.id %}" >Back</a>
                 </li>
             </ul>
             <div class="custom-control custom-switch ml-3">
@@ -240,6 +241,11 @@ body.dark-mode .button-contactForm{
     <!-- All Review section -->
 <div class="container mt-5 all-review-container">
     <h1>All Review</h1>
+    <div>
+        <a href="?star_filter" class="btn btn-outline-primary">All Ratings</a>
+        <a href="?star_filter=lte3" class="btn btn-outline-primary">Rating ⭐ 3 or Less</a>
+        <a href="?star_filter=gt3" class="btn btn-outline-primary">Rating ⭐ Above 3</a>
+    </div>
     <div class="row">
         {% for review in reviews %}
         <div class="col-md-4 mb-4">
@@ -350,10 +356,6 @@ body.dark-mode .button-contactForm{
                 }
             })
         })
-
-        function goBack() {
-            window.history.back();
-        }
 
         $(".recommendation .btn").on("click", function() {
             let recommended = $(this).data("value");
