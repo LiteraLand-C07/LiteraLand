@@ -17,7 +17,7 @@
     }
 
     .nav-link:hover {
-    color: #ffffff; /* Atur ke warna yang Anda inginkan */
+    color: #ffffff;
     }
 </style>
 {% endblock link %}
@@ -126,6 +126,7 @@
         document.querySelector('.thumbnail').setAttribute('src', imgHttps)
     }
 
+    // Tampilkan cover ketika petama kali diakses
     getCover()
 
 
@@ -138,7 +139,7 @@
     async function refreshPage(){
         var is_login = document.querySelector('.book').getAttribute('is-login')
 
-        if (is_login){
+        if (is_login === 'True'){
 
             document.getElementById('modal-header').innerHTML = ""
             document.getElementById('rating').innerHTML = ""
@@ -232,6 +233,7 @@
         }
     }
 
+    // refresh page pertama kali
     refreshPage()
 
     function isValid(rating,current_page,status_baca){

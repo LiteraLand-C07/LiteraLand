@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from shared_models.models import Book
 
 class BookReview(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="reviewss")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="reviews")
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True, related_name="reviews")
     review = models.TextField()
     reviewer_name = models.CharField(max_length=255)

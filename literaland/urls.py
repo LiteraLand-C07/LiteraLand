@@ -16,6 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from browseBooks.views import browse_books
+from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +27,8 @@ urlpatterns = [
     path('authentication/',include('shared_models.urls')),
     path('administrator/', include('administrator.urls')),
     path('rankingBuku/', include('rankingBuku.urls')),
+    path('browse/', browse_books, name='browse_books'),
+    path('browse/', include('browseBooks.urls')),
+    path('', browse_books, name='home'),
+    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
 ]
