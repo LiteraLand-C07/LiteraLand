@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'administrator',
     'browseBooks',
     'widget_tweaks',
+
 ]
 
 MIDDLEWARE = [
