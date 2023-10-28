@@ -6,6 +6,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Avg
 import json
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def show_detail_buku(request,id):
@@ -17,14 +18,14 @@ def show_detail_buku(request,id):
         'rating':average_rating,
         'StatusBaca':StatusBaca,
         'range':range(1,11),
+        'user':request.user,
     }
 
     return render(request,'detail_buku.html',context)
 
 def get_collection_json(request,id):
     book = Book.objects.get(pk=id)
-    # JANGAN LUPA FILTER TERHADAP USER JUGA
-    book_collection = BookCollection.objects.filter(book=book)
+    book_collection = BookCollection.objects.filter(book=book,user=request.user)
     return HttpResponse(serializers.serialize('json', book_collection))
 
 @csrf_exempt
@@ -35,7 +36,7 @@ def add_collection(request,id):
         current_page = request.POST.get('current_page')
         status_baca = request.POST.get('status_baca')
 
-        new_collection = BookCollection(book=book_data,rating=rating,current_page=current_page,status_baca=status_baca)
+        new_collection = BookCollection(user=request.user,book=book_data,rating=rating,current_page=current_page,status_baca=status_baca)
         new_collection.save()
 
         return HttpResponse(b"CREATED", status=201)
@@ -59,18 +60,19 @@ def edit_collection(request,id):
     
     return HttpResponseNotFound() 
 
+@login_required(login_url='/authentication/login')
 def show_collections(request):
-    # JANGAN LUPA FILTER TERHADAP USER
-    book_collections = BookCollection.objects.all()
+    book_collections = BookCollection.objects.filter(user=request.user)
     context = {
         'book_collections':book_collections,
         'StatusBaca':StatusBaca,
+        'user':request.user.username,
     }
 
     return render(request,'collections.html',context)
 
 def get_collections_json(request):
-    collections = BookCollection.objects.all()
+    collections = BookCollection.objects.filter(user=request.user)
     data = []
     for collection in collections:
         item = {
@@ -84,8 +86,7 @@ def get_collections_json(request):
             'rating': collection.rating,
             'current_page': collection.current_page,
             'status_baca': collection.status_baca,
-            'status_baca_display': collection.get_status_baca_display(),  # add this line
-            # add other fields if necessary
+            'status_baca_display': collection.get_status_baca_display(),
         }
         data.append(item)
     return JsonResponse(data, safe=False)
@@ -184,3 +185,12 @@ def delete_collection(request,id):
         return HttpResponse(b"DELETED",status=201)
     
     return HttpResponseNotFound()
+
+def read_book_content(request,id):
+    book = Book.objects.get(pk=id)
+
+    context = {
+        'book': book,
+    }
+
+    return render(request,'read_book.html',context)
