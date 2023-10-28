@@ -1,108 +1,266 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">LiteraLand</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="javascript:history.back()">Go Back</a>
-                </li>
-                <!-- fitur lain-->
-            </ul>
-        </div>
-    </nav>
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="display-4">Reviews for {{ book.title }}</h1>
-            </div>
-        </div>
 
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <form id="reviewForm">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="reviewTextarea">Write your review:</label>
-                        <textarea class="form-control" id="reviewTextarea" name="review" rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Review</button>
-                </form>
-            </div>
-        </div>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-        <div class="row mt-5" id="reviews">
-            {% for review in reviews %}
-                <div class="col-md-12 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            {{ review.review }}
-                        </div>
-                        <div class="card-footer text-muted">
-                            By {{ review.user.username }}
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Poppins', sans-serif;
+}
+
+:root {
+	--yellow: #FFBD13;
+	--blue: #4383FF;
+	--blue-d-1: #3278FF;
+	--light: #F5F5F5;
+	--grey: #AAA;
+	--white: #FFF;
+	--shadow: 8px 8px 30px rgba(0,0,0,.05);
+}
+
+
+.wrapper {
+	background: var(--white);
+	padding: 2rem;
+	max-width: 576px;
+	width: 100%;
+	border-radius: .75rem;
+	box-shadow: var(--shadow);
+	text-align: center;
+}
+.wrapper h3 {
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin-bottom: 1rem;
+}
+.rating {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	grid-gap: .5rem;
+	font-size: 2rem;
+	color: var(--yellow);
+	margin-bottom: 2rem;
+}
+.rating .star {
+	cursor: pointer;
+}
+.rating .star.active {
+	opacity: 0;
+	animation: animate .5s calc(var(--i) * .1s) ease-in-out forwards;
+}
+
+@keyframes animate {
+	0% {
+		opacity: 0;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.2);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+
+.rating .star:hover {
+	transform: scale(1.1);
+}
+textarea {
+	width: 100%;
+	background: var(--light);
+	padding: 1rem;
+	border-radius: .5rem;
+	border: none;
+	outline: none;
+	resize: none;
+	margin-bottom: .5rem;
+}
+.btn-group {
+	display: flex;
+	grid-gap: .5rem;
+	align-items: center;
+}
+.btn-group .btn {
+	padding: .75rem 1rem;
+	border-radius: .5rem;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-size: .875rem;
+	font-weight: 500;
+}
+.btn-group .btn.submit {
+	background: var(--blue);
+	color: var(--white);
+}
+.btn-group .btn.submit:hover {
+	background: var(--blue-d-1);
+}
+.btn-group .btn.cancel {
+	background: var(--white);
+	color: var(--blue);
+}
+.btn-group .btn.cancel:hover {
+	background: var(--light);
+}
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.wrapper {
+    background: var(--white);
+    padding: 2rem;
+    max-width: 576px;
+    width: 100%;
+    border-radius: .75rem;
+    box-shadow: var(--shadow);
+    text-align: center;
+    
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+</style>
+
+    
+    <div class="wrapper">
+		<h3 class="display-4">Reviews for {{ book.title }}</h3>
+        <strong class="text-success" id="review-res"></strong>
+        {% csrf_token %}
+		<form class="form-contact comment_form hide-comment-form" action="{% url 'forumDiskusi:ajax_add_review' book.id %}" id="reviewForm" method="POST">
+            
+            {{review_form.review}}
+            {{review_form.star_rating}}
+			<div class="rating">
+				<input type="number" name="rating" hidden>
+				<i class='bx bx-star star' style="--i: 0;"></i>
+				<i class='bx bx-star star' style="--i: 1;"></i>
+				<i class='bx bx-star star' style="--i: 2;"></i>
+				<i class='bx bx-star star' style="--i: 3;"></i>
+				<i class='bx bx-star star' style="--i: 4;"></i>
+			</div>
+			<div class="form-group">
+				<button type="submit" class="button button-contactForm" value='{{ book.pk }}' name="bookId">Submit</button>
+				<button class="btn cancel">Cancel</button>
+			</div>
+		</form>
+	</div>
+
+    <div class="tab-pane fade" id="Reviews">
+        <div class="comment-area">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h4 class="mb-30">All Review</h4>
+                    <div class="comment-list">
+                        {% for review in reviews %}
+                        <div class="single-comment justify-content-between d-flex mb-30">
+                            <div class="user justify-content-between d-flex">
+                            <div class="thumb text-center">
+                                <a href="#" class="font-heading text-brand"> anto </a>
+                            </div>
+                            <div class="desc">
+                                <div class="d-flex justify-content-between mb-10">
+                                    <div class="d-flex align-items-center">
+                                        <span class="font-xs text-muted" >{{review.date | date:"d M, Y"}}</span>
+                                    </div>
+                                    <div class="product-rate d-inline-block">
+                                        <div class="product-rating" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <p class="mb-10">{{review.review}}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
     </div>
-
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('#reviewForm');
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const review = form.querySelector('textarea').value;
-                const csrf = form.querySelector('input[name=csrfmiddlewaretoken]').value;
+        console.log("working fine")
+        const monthNames = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov","Dec"];
 
-                fetch('/forumDiskusi/book_reviews/{{ book.id }}/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrf,
-                    },
-                    body: JSON.stringify({ review: review })
-                })
+        $("#reviewForm").submit(function(e){
+            e.preventDefault();
             
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Display the review under the submit button
-                        const reviewsDiv = document.querySelector('#reviews');
-                        
-                        const newReviewCol = document.createElement('div');
-                        newReviewCol.className = 'col-md-12 mb-3';
-                        
-                        const newReviewCard = document.createElement('div');
-                        newReviewCard.className = 'card';
-                        
-                        const cardBody = document.createElement('div');
-                        cardBody.className = 'card-body';
-                        cardBody.textContent = review;
-                        
-                        const cardFooter = document.createElement('div');
-                        cardFooter.className = 'card-footer text-muted';
-                        cardFooter.textContent = 'By ' + '{{ user.username }}';
-                        
-                        newReviewCard.appendChild(cardBody);
-                        newReviewCard.appendChild(cardFooter);
-                        newReviewCol.appendChild(newReviewCard);
-                        reviewsDiv.appendChild(newReviewCol);
+            let dt = new Date();
+            let time = dt.getDay() + " " + monthNames[dt.getUTCMonth()] + ", " + dt.getFullYear()
+        
+            $.ajax({
+                headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                data: $(this).serialize(),
+                method: $(this).attr("method"),
+                url: $(this).attr("action"),
+                dataType: "json",
+                success: function(res) {
+                    console.log("Comment saved to db...");
+                    
+                    if(res.bool == true){
+                        $("#review-res").html("Review added successfully")
+                        $(".hide-comment-form").hide()
 
-                        // Redirect to the forum page
-                        window.location.href = '/forumDiskusi/'; 
+                        let _html = '<div class="single-comment justify-content-between d-flex mb-30">'
+                            _html += '<div class="user justify-content-between d-flex">'
+                            _html += '<div class="thumb text-center">'
+                            _html += '<a href="#" class="font-heading text-brand">'+ res.context.user +'</a>'
+                            _html += '</div>'
+
+                            _html += '<div class="desc">'
+                            _html += '<div class="d-flex justify-content-between mb-10">'
+                            _html += '<div class="d-flex align-items-center">'
+                            _html += '<span class="font-xs text-muted" >'+ time +'</span>'
+                            _html += '</div>'
+
+                            for(let i = 1; i < res.context.star_rating; i++){
+                                _html += '<i class="fas fa-star text-warning">'
+                            }
+
+                            _html += '</div>'
+                            _html += '<p class="mb-10">'+ res.context.review +'</p>'
+
+                            _html += '</div>'
+                            _html += '</div>'
+                            _html += '</div>'
+
+                            $(".comment-list").prepend(_html)
                     }
+                }})
+            })
+               const allStar = document.querySelectorAll('.rating .star')
+        const ratingValue = document.querySelector('.rating input')
+
+        allStar.forEach((item, idx)=> {
+            item.addEventListener('click', function () {
+                let click = 0
+                ratingValue.value = idx + 1
+
+                allStar.forEach(i=> {
+                    i.classList.replace('bxs-star', 'bx-star')
+                    i.classList.remove('active')
                 })
-                .catch(error => console.error('Error:', error));
-            });
-        });
+                for(let i=0; i<allStar.length; i++) {
+                    if(i <= idx) {
+                        allStar[i].classList.replace('bx-star', 'bxs-star')
+                        allStar[i].classList.add('active')
+                    } else {
+                        allStar[i].style.setProperty('--i', click)
+                        click++
+                    }
+                }
+            })
+        })
     </script>
 {% endblock %}
