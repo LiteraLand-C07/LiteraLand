@@ -7,7 +7,6 @@ from browseBooks.views import browse_books
 app_name = 'forumDiskusi'
 
 urlpatterns = [
-    path('', hello, name="hello"),
     path('detail_buku/<int:id>/', show_detail_buku, name="show_detail_buku"),
     path('book_reviews/<int:book_id>/', book_reviews, name='book_reviews'),
     path('delete_review/<int:book_id>/', delete_review, name='delete_review'),
