@@ -9,7 +9,7 @@ def browse_books(request):
     books = Book.objects.all()  # Mengambil semua buku
     return render(request, 'browse_books.html', {'books': books})
 
-@login_required
+# @login_required
 def submit_book_request(request):
     if request.method == 'POST':
         form = BookRequestForm(request.POST)

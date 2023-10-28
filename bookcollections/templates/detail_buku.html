@@ -9,10 +9,10 @@
 {% block link %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap" rel="stylesheet">
 <style>
     body {
-        font-family: 'Roboto', sans-serif;
+        font-family: 'Tilt Neon', sans-serif;
         background-color: rgb(86, 85, 85);
     }
 
@@ -22,61 +22,53 @@
 </style>
 {% endblock link %}
 
+{% block nav %}
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="">Browse Book</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="/collections/">MyCollections</a>
+    </li>
+
+    {% if user.is_authenticated %}
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="">Recommendation</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:logout' %}">Logout</a>
+    </li>
+
+    {% else %}
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:login' %}?next={{ request.path }}"">Login</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:register' %}">Register</a>
+    </li>
+    {% endif %}
+    
+{% endblock nav %}
 
 {% block content %}
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">
-            <i class="bi bi-journal-bookmark-fill"></i>
-            LiteraLand
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link my-2 my-lg-0" href="">Browse Book</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link my-2 my-lg-0" href="">Recommendation</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link my-2 my-lg-0" href="/collections/">MyCollections</a>
-                </li>
-                <!-- DISPLAY IF IN GUEST MODE -->
-                <li class="nav-item">
-                    <a class="nav-link my-2 my-lg-0" href="">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link my-2 my-lg-0" href="">Register</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-
-
 <!-- DISPLAY BOOK INFORMATION IN  CARD LAYOUT-->
 <div class="container-fluid mt-4 mb-4">
-    <div class="card p-3 book text-bg-dark p-3 shadow-lg rounded" data-isbn="{{book.ISBN}}" book-id="{{book.pk}}" book-page="{{book.page_count}}">
+    <div class="card p-3 book text-bg-dark p-3 shadow-lg rounded" data-isbn="{{book.ISBN}}" book-id="{{book.pk}}" book-page="{{book.page_count}}" is-login="{{user.is_authenticated}}">
         <div class="row g-2">
             <div class="col-md-4">
                 <img src="" alt="Book Cover" class="img-fluid thumbnail rounded">
             </div>
             <div class="col-md-8">
                 <div class="card-body">
-                    <h5 class="card-title"><strong>{{book.title}}</strong></h5>
-                    <p class="card-text font-monospace"><small>Author: {{book.author}}</small></p>
-                    <p class="card-text font-monospace"><strong>Rating</strong>: {{rating}}</p>
-                    <p class="card-text font-monospace"><strong>Publisher</strong>: {{book.publisher}}</p>
-                    <p class="card-text font-monospace"><strong>Total Page</strong>: {{book.page_count}}</p>
-                    <p class="card-text font-monospace"><strong>Genre</strong>: {{book.genre}}</p>
-                    <p class="card-text font-monospace"><strong>ISBN</strong>: {{book.ISBN}}</p>
-                    <p class="card-text font-monospace"><strong>Language</strong>: {{book.language}}</p>
-                    <p class="card-text font-monospace"><strong>Published Date</strong>: {{book.published_date}}</p>
+                    <h3 class="card-title"><strong>{{book.title}}</strong></h3>
+                    <p class="card-text"><small><i class="bi bi-pencil-fill me-2"></i>Author: {{book.author}}</small></p>
+                    <p class="card-text"><strong><i class="bi bi-star-fill me-2"></i>Rating</strong>: {{rating}}</p>
+                    <p class="card-text"><strong><i class="bi bi-file-arrow-up-fill me-2"></i>Publisher</strong>: {{book.publisher}}</p>
+                    <p class="card-text"><strong><i class="bi bi-file-earmark-break-fill me-2"></i>Total Page</strong>: {{book.page_count}}</p>
+                    <p class="card-text"><strong><i class="bi bi-film me-2"></i>Genre</strong>: {{book.genre}}</p>
+                    <p class="card-text"><strong><i class="bi bi-list-ol me-2"></i>ISBN</strong>: {{book.ISBN}}</p>
+                    <p class="card-text"><strong><i class="bi bi-globe2 me-2"></i>Language</strong>: {{book.language}}</p>
+                    <p class="card-text"><strong><i class="bi bi-calendar-event-fill me-2"></i>Published Date</strong>: {{book.published_date}}</p>
                     <p class="card-text text-start"><strong>Description</strong>:<br> {{book.description}}</p>
                     <div class="mt-4 d-flex flex-wrap flex-row justify-content-start gap-3" id="button-collection"></div>
                 </div>
@@ -88,7 +80,7 @@
 <!-- MODAL TO ADD COLLECTIONS -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content font-monospace fw-bold">
+        <div class="modal-content fw-bold">
             <div class="modal-header" id="modal-header"></div>
             <div class="modal-body">
                 <form id="form-collection" onsubmit="return false;">
@@ -144,94 +136,100 @@
     }
 
     async function refreshPage(){
-        document.getElementById('modal-header').innerHTML = ""
-        document.getElementById('rating').innerHTML = ""
-        document.getElementById('status_baca').innerHTML = ""
-        document.getElementById('modal-footer').innerHTML = ""
-        document.getElementById('button-collection').innerHTML = ""
+        var is_login = document.querySelector('.book').getAttribute('is-login')
 
-        const books = await getBookCollection()
-        var statusBacaChoices = [
-            {value: 'C', label: 'Completed'},
-            {value: 'R', label: 'Reading'},
-            {value: 'PR', label: 'Plan to Read'},
-            {value: 'D', label: 'Dropped'}
-        ];
+        if (is_login){
 
-        let modalHeader = ''
-        let ratingHTML = ''
-        let statusHTML = ''
-        let modalFooter = ''
-        let buttonHTML = ''
+            document.getElementById('modal-header').innerHTML = ""
+            document.getElementById('rating').innerHTML = ""
+            document.getElementById('status_baca').innerHTML = ""
+            document.getElementById('modal-footer').innerHTML = ""
+            document.getElementById('button-collection').innerHTML = ""
+            var idBook = document.querySelector('.book').getAttribute('book-id')
 
-        if (books.length == 0){
-            modalHeader += `
-            <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Add to MyCollection</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            `
+            const books = await getBookCollection()
+            var statusBacaChoices = [
+                {value: 'C', label: 'Completed'},
+                {value: 'R', label: 'Reading'},
+                {value: 'PR', label: 'Plan to Read'},
+                {value: 'D', label: 'Dropped'}
+            ];
 
-            ratingHTML += '<option value="0">Select Rating:</option>'
-            for (var i = 1; i <= 10; i++){
-                ratingHTML += `<option value="${ i }">${ i }</option>`
+            let modalHeader = ''
+            let ratingHTML = ''
+            let statusHTML = ''
+            let modalFooter = ''
+            let buttonHTML = ''
+
+            if (books.length == 0){
+                modalHeader += `
+                <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Add to MyCollection</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                `
+
+                ratingHTML += '<option value="0">Select Rating:</option>'
+                for (var i = 1; i <= 10; i++){
+                    ratingHTML += `<option value="${ i }">${ i }</option>`
+                }
+
+                statusHTML += `<option value="">Select Status:</option>`
+                for (var i = 0; i < statusBacaChoices.length; i++) {
+                    var choice = statusBacaChoices[i];
+                    var value = choice.value;
+                    var label = choice.label;
+                    statusHTML += `<option value="${value}"}>${label}</option>`
+                }
+
+                modalFooter += `
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="addCollection()">Add</button>
+                `
+
+                buttonHTML += `
+                <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal""><i class="bi bi-plus-circle me-1"></i>Add to Collections</button>
+                <a class="btn btn-outline-light" href="/forumDiskusi/book_reviews/${idBook}/"><i class="bi bi-chat-dots me-1"></i>Review Book</a>
+                `
+
+            } else {
+                const book = books[0];  
+
+                modalHeader += `
+                <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Edit Collection</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                `
+                
+                ratingHTML += '<option value="0">Select Rating:</option>'
+                for (var i = 1; i <= 10; i++){
+                    ratingHTML += `<option id="rating-${i}" value="${ i }"  ${i == book.fields.rating ? 'selected' : ''}>${ i }</option>`
+                }
+
+                document.getElementById('current_page').setAttribute("value",book.fields.current_page)
+
+                for (var i = 0; i < statusBacaChoices.length; i++) {
+                    var choice = statusBacaChoices[i];
+                    var value = choice.value;
+                    var label = choice.label;
+                    statusHTML += `<option value="${value}" ${value == book.fields.status_baca ? 'selected' : ''}>${label}</option>`
+                }
+
+                modalFooter += `
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="editCollection()">Edit</button>
+                `
+
+                buttonHTML += `
+                <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal""><i class="bi bi-pencil-square me-1"></i>Edit Collection</button>
+                <a class="btn btn-outline-light" href="/forumDiskusi/book_reviews/${idBook}/"><i class="bi bi-chat-dots me-1"></i>Review Book</a>
+                `
+        
             }
 
-            statusHTML += `<option value="">Select Status:</option>`
-            for (var i = 0; i < statusBacaChoices.length; i++) {
-                var choice = statusBacaChoices[i];
-                var value = choice.value;
-                var label = choice.label;
-                statusHTML += `<option value="${value}"}>${label}</option>`
-            }
-
-            modalFooter += `
-            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="addCollection()">Add</button>
-            `
-
-            buttonHTML += `
-            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal"">Add to Collections</button>
-            <button class="btn btn-outline-light">Review Book</button>
-            `
-
-        } else {
-            const book = books[0];  
-
-            modalHeader += `
-            <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Edit Collection</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            `
-            
-            ratingHTML += '<option value="0">Select Rating:</option>'
-            for (var i = 1; i <= 10; i++){
-                ratingHTML += `<option id="rating-${i}" value="${ i }"  ${i == book.fields.rating ? 'selected' : ''}>${ i }</option>`
-            }
-
-            document.getElementById('current_page').setAttribute("value",book.fields.current_page)
-
-            for (var i = 0; i < statusBacaChoices.length; i++) {
-                var choice = statusBacaChoices[i];
-                var value = choice.value;
-                var label = choice.label;
-                statusHTML += `<option value="${value}" ${value == book.fields.status_baca ? 'selected' : ''}>${label}</option>`
-            }
-
-            modalFooter += `
-            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="editCollection()">Edit</button>
-            `
-
-            buttonHTML += `
-            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal"">Edit Collection</button>
-            <button class="btn btn-outline-light">Review Book</button>
-            `
-    
+            document.getElementById('modal-header').innerHTML = modalHeader;
+            document.getElementById('rating').innerHTML = ratingHTML
+            document.getElementById('status_baca').innerHTML = statusHTML
+            document.getElementById('modal-footer').innerHTML = modalFooter
+            document.getElementById('button-collection').innerHTML = buttonHTML
         }
-
-        document.getElementById('modal-header').innerHTML = modalHeader;
-        document.getElementById('rating').innerHTML = ratingHTML
-        document.getElementById('status_baca').innerHTML = statusHTML
-        document.getElementById('modal-footer').innerHTML = modalFooter
-        document.getElementById('button-collection').innerHTML = buttonHTML
     }
 
     refreshPage()

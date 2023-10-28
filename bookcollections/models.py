@@ -1,5 +1,6 @@
 from django.db import models
 from shared_models.models import Book
+from django.contrib.auth.models import User
 
 # Create your models here.
 class StatusBaca(models.TextChoices):
@@ -10,6 +11,7 @@ class StatusBaca(models.TextChoices):
 
 class BookCollection(models.Model):
     CHOICES = [(i,i) for i in range(11)]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     book = models.ForeignKey(Book,on_delete=models.CASCADE,null=True)
     rating = models.IntegerField(choices=CHOICES)
     current_page = models.IntegerField()
