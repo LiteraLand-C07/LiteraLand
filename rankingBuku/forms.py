@@ -2,9 +2,7 @@ from django import forms
 from rankingBuku.models import ListBook
 from shared_models.models import Book
 
-class ListBookForm(forms.ModelForm):
-    image = forms.ImageField(required=True, label='Cover Image')
-    
+class ListBookForm(forms.ModelForm):    
     class Meta:
         model = ListBook
         fields = ['name', 'access', 'description', 'books', 'image']
