@@ -3,7 +3,7 @@
 <style>
     .custom-card {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        margin: 10px;
+        margin: 20px;
     }
 
     body{
@@ -14,21 +14,34 @@
 {% endblock link %}
 
 {% block nav %}
+    {% if user.is_authenticated %}
     <li class="nav-item">
         <a class="nav-link my-2 my-lg-0" href="{% url 'create_book_list' %}" >Create Book List</a>
     </li>
     <li class="nav-item">
         <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:logout' %}">Logout</a>
     </li>
+
+    {% else %}
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:login' %}?next={{ request.path }}">Login</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:register' %}">Register</a>
+    </li>
+    {% endif %}
+
 {% endblock nav %}
 
 {% block content %}
 <body>
     <container >
         <br>
+        {% if user.is_authenticated %}
         <h5 style="size: 25px; color: #AABBCC;"><b> Your Book Lists</b></h5>
         <div id="card_deck_user" class="row"></div>
         <hr style="color: #AABBCC;">
+        {% endif %}
         <h5 style="size: 25px; color: #AABBCC;"><b>Discover More</b></h5>
         <div id="card_deck_public" class="row"></div>
     </container>
@@ -47,13 +60,11 @@
         const mybooklists = await getMyListBooks();
 
         let htmlString = '<div class="row">';
-        mybooklists.forEach((mybooklist) => {
-            const imageUrl = "{% if mybooklist.fields.image %}{{ mybooklist.fields.image.url }}{% else %}/static/default_image.png{% endif %}";
-            
+        mybooklists.forEach((mybooklist) => {            
             htmlString += `
             <div class="col-md-3">
                 <div class="card custom-card" data-list-id="${mybooklist.pk}"> <!-- Set the data-list-id attribute here -->
-                    <img id="cover-${mybooklist.pk}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover; src="${mybooklist.fields.image}" alt="List Image" width="200">
+                    <img src=${mybooklist.fields.image} id="cover-${mybooklist.pk}" class="card-img-center" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover; >
                     <div class="card-body">
                         <h5 class="card-title text-truncate" style="font-family: Nunito, sans-serif; font-size: 20px;  font-weight: 600; letter-spacing: 0.5px;">${mybooklist.fields.name}</h5>
                         <p class="card-text text-truncate" style="font-weight: 400;">${mybooklist.fields.description}</p>                  
@@ -63,7 +74,7 @@
             `;
         });
         
-        htmlString += '</div>';
+        htmlString += `</div>`;
         document.getElementById('card_deck_user').innerHTML = htmlString;
         
         const cards = document.querySelectorAll('.custom-card');
@@ -84,7 +95,7 @@
             htmlString += `
             <div class="col-md-3">
                 <div class="card custom-card" data-list-id="${booklist.pk}"> <!-- Set the data-list-id attribute here -->
-                    <img id="cover-${booklist.pk}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover; src="${booklist.fields.image}" alt="List Image" width="200">
+                    <img src="${booklist.fields.image}" id="cover-${booklist.pk}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover; >
                     <div class="card-body">
                         <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px;">${booklist.fields.name}</h5>
                         <p class="card-text text-truncate" style="font-weight: 400;">${booklist.fields.description}</p>
@@ -108,7 +119,7 @@
         // Get the list ID from the clicked card's data attribute
         const listId = event.currentTarget.dataset.listId;
         // Redirect to the detail page using the list ID
-        window.location.href = `{% url 'list_book_detail' %}?id=${listId}`;
+        window.location.href = `/rankingBuku/list_book_detail/${listId}`;
     }
 
     refreshMyListBooks()

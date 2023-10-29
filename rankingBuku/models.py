@@ -11,7 +11,7 @@ class ListBook(models.Model):
     ], default='public')
     description = models.TextField()
     books = models.ManyToManyField(Book, blank=True, related_name='list_books')
-    cover_image = models.ImageField(upload_to='list_book_covers/', blank=True, null=True)
+    image = models.CharField(max_length=255, default='https://i.imgur.com/CFVTM7y.png')
 
     def __str__(self):
         return self.name
