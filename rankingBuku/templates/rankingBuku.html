@@ -5,24 +5,77 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         margin: 10px;
     }
+
+    body{
+        background-color: #2C343F;
+    }
+
 </style>
 {% endblock link %}
 
+{% block nav %}
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="{% url 'create_book_list' %}" >Create Book List</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:logout' %}">Logout</a>
+    </li>
+{% endblock nav %}
+
 {% block content %}
-<title>Ranking Buku</title>
-
-<p>halo</p>
-<h1>Book Lists</h1>
-
-<div id="card_deck" class="row"></div>
+<body>
+    <container >
+        <br>
+        <h5 style="size: 25px; color: #AABBCC;"><b> Your Book Lists</b></h5>
+        <div id="card_deck_user" class="row"></div>
+        <hr style="color: #AABBCC;">
+        <h5 style="size: 25px; color: #AABBCC;"><b>Discover More</b></h5>
+        <div id="card_deck_public" class="row"></div>
+    </container>
 
 <script>
+    async function getMyListBooks() {
+        return fetch("{% url 'get_my_book_lists' %}").then((res) => res.json())
+    }
+
     async function getListBooks() {
         return fetch("{% url 'get_book_lists_json' %}").then((res) => res.json())
     }
 
+    async function refreshMyListBooks() {
+        document.getElementById("card_deck_user").innerHTML = "";
+        const mybooklists = await getMyListBooks();
+
+        let htmlString = '<div class="row">';
+        mybooklists.forEach((mybooklist) => {
+            const imageUrl = "{% if mybooklist.fields.image %}{{ mybooklist.fields.image.url }}{% else %}/static/default_image.png{% endif %}";
+            
+            htmlString += `
+            <div class="col-md-3">
+                <div class="card custom-card" data-list-id="${mybooklist.pk}"> <!-- Set the data-list-id attribute here -->
+                    <img id="cover-${mybooklist.pk}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover; src="${mybooklist.fields.image}" alt="List Image" width="200">
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate" style="font-family: Nunito, sans-serif; font-size: 20px;  font-weight: 600; letter-spacing: 0.5px;">${mybooklist.fields.name}</h5>
+                        <p class="card-text text-truncate" style="font-weight: 400;">${mybooklist.fields.description}</p>                  
+                    </div>
+                </div>
+            </div>
+            `;
+        });
+        
+        htmlString += '</div>';
+        document.getElementById('card_deck_user').innerHTML = htmlString;
+        
+        const cards = document.querySelectorAll('.custom-card');
+        cards.forEach((card) => {
+            card.addEventListener('click', redirectToDetailPage);
+        });
+
+        
+    }
+
     async function refreshListBooks() {
-        document.getElementById("card_deck").innerHTML = "";
+        document.getElementById("card_deck_public").innerHTML = "";
         const booklists = await getListBooks();
 
         let htmlString = '<div class="row">';
@@ -34,16 +87,17 @@
                     <img id="cover-${booklist.pk}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover; src="${booklist.fields.image}" alt="List Image" width="200">
                     <div class="card-body">
                         <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px;">${booklist.fields.name}</h5>
-                        <p class="card-text" style="font-weight: 400;">${booklist.fields.description}</p>
-                        <p class="card-text" style="font-weight: 400;">${booklist.fields.books}</p>
+                        <p class="card-text text-truncate" style="font-weight: 400;">${booklist.fields.description}</p>
+                        
                     </div>
                 </div>
             </div>
             `;
         });
-        document.getElementById('card_deck').innerHTML = htmlString;
+        
         htmlString += '</div>';
-
+        document.getElementById('card_deck_public').innerHTML = htmlString;
+        
         const cards = document.querySelectorAll('.custom-card');
         cards.forEach((card) => {
             card.addEventListener('click', redirectToDetailPage);
@@ -53,14 +107,14 @@
     async function redirectToDetailPage(event) {
         // Get the list ID from the clicked card's data attribute
         const listId = event.currentTarget.dataset.listId;
-        
         // Redirect to the detail page using the list ID
         window.location.href = `{% url 'list_book_detail' %}?id=${listId}`;
     }
 
+    refreshMyListBooks()
     refreshListBooks()
-    
+
 </script>
 
-<a href="{% url 'create_book_list' %}" class="btn btn-primary">Create Book List</a>
+</body>
 {% endblock %}

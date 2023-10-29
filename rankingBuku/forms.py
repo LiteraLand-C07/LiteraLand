@@ -3,7 +3,7 @@ from rankingBuku.models import ListBook
 from shared_models.models import Book
 
 class ListBookForm(forms.ModelForm):
-    image = forms.ImageField(required=False, label='Cover Image')
+    image = forms.ImageField(required=True, label='Cover Image')
     
     class Meta:
         model = ListBook
