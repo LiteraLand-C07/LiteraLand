@@ -8,6 +8,6 @@ urlpatterns = [
     path('browse/', browse_books, name='browse_books'),
     path('submit-request/', submit_book_request, name='submit_book_request'),
     path('success/', success_page, name='success_page'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='/authentication/login'), name='logout'),
 ]
 

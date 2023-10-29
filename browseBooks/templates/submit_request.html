@@ -1,7 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Submit Request</title>
+
+
+{% block meta %}
+<title>Submit Request</title>
+{% endblock meta %}
+
+{% block link %}
     <style>
         html, body {
             height: 100%;
@@ -52,8 +55,9 @@
             background-color: #0056b3;
         }
     </style>
-</head>
-<body>
+{% endblock link %}
+
+{% block content %}
     <div class="container">
         <h2>Submit Request</h2>
         <form method="post">
@@ -62,5 +66,6 @@
             <button type="submit">Submit Request</button>
         </form>
     </div>
-</body>
-</html>
+
+
+{% endblock %}

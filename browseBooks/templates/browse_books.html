@@ -4,13 +4,7 @@
         <!-- nanti tambahin buat fungsi/modul masing2 -->
         <!-- untuk sekarang belom ada fungsionalitasnya, baru tombol -->
         <li class="nav-item">
-            <a class="nav-link" href="#">My Collection</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Ranking</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Book Review</a>
+            <a class="nav-link" href="/collections/">My Collection</a>
         </li>
         <!-- Logout Button (only visible if user is logged in) -->
         {% if user.is_authenticated %}
@@ -49,7 +43,9 @@
                     <!-- <img class="card-img-left thumbnail" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover;" data-isbn="{{ book.ISBN }}"> -->
                     <!-- <img id="cover-{{ book.id }}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover;"> -->
                     <div class="card-body">
-                        <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px;">{{ book.title }}</h5>
+                        <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px; ">
+                            <a href="/collections/detail_buku/{{ book.pk }}">{{ book.title }}</a>
+                        </h5>
                         <p class="card-text" style="font-weight: 400;">{{ book.author }}</p>
                     </div>
                 </div>
@@ -65,26 +61,6 @@
     </div>
 </div>
 {% endblock %}
-
-<div class="container mt-4">
-    <h2>Book request</h2>
-    <p>If you cannot find the book you are looking for, you can request a book here.</p>
-    <form>
-        <div class="mb-3">
-            <label for="bookTitle" class="form-label">Book title</label>
-            <input type="text" class="form-control" id="bookTitle" placeholder="Insert book title">
-        </div>
-        <div class="mb-3">
-            <label for="bookAuthor" class="form-label">Author</label>
-            <input type="text" class="form-control" id="bookAuthor" placeholder="Insert author">
-        </div>
-        <div class="mb-3">
-            <label for="additionalInfo" class="form-label">Additional information (Optional)</label>
-            <textarea class="form-control" id="additionalInfo" rows="3" placeholder="Insert additional information here"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Book request</button>
-    </form>
-</div>
 
 <script>
     function getCover(isbn) {
