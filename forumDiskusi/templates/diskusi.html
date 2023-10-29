@@ -185,29 +185,25 @@ body.dark-mode .button-contactForm{
 
 </style>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="#">LiteraLand</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'forumDiskusi:browse_books' %}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'forumDiskusi:show_detail_buku' book.id %}" >Back</a>
-                </li>
-            </ul>
-            <div class="custom-control custom-switch ml-3">
-                <input type="checkbox" class="custom-control-input" id="darkSwitch">
-                <label class="custom-control-label" for="darkSwitch" style="color: #AAA;">Dark Mode</label>
-            </div>
-        </div>
+{% block nav %}
+<div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="{% url 'forumDiskusi:browse_books' %}">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'forumDiskusi:show_detail_buku' book.id %}" >Back</a>
+        </li>
+    </ul>
+    <div class="custom-control custom-switch ml-3">
+        <input type="checkbox" class="custom-control-input" id="darkSwitch">
+        <label class="custom-control-label" for="darkSwitch" style="color: #AAA;">Dark Mode</label>
     </div>
-</nav>
+</div>
+{% endblock nav %}
     
+
+
 <div class="container mt-5 ">
     <!-- Wrapper section -->
     <div class="row">
