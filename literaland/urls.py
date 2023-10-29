@@ -27,12 +27,8 @@ urlpatterns = [
     path('forumDiskusi/',include('forumDiskusi.urls')),
     path('authentication/',include('shared_models.urls')),
     path('administrator/', include('administrator.urls')),
-    path('rankingBuku/', include('rankingBuku.urls')),
-    path('browse/', browse_books, name='browse_books'),
-    path('browse/', include('browseBooks.urls')),
-    path('', browse_books, name='home'),
-    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
     path('', include('browseBooks.urls')),
+    path('rankingBuku/', include('rankingBuku.urls')),
 ]
 
 if settings.DEBUG:
