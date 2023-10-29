@@ -9,7 +9,7 @@
         <!-- Logout Button (only visible if user is logged in) -->
         {% if user.is_authenticated %}
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            <a class="nav-link" href="{% url 'shared_models:logout' %}">Logout</a>
         </li>
         {% endif %}
     {% endblock nav %}
@@ -22,6 +22,20 @@
     .main-title {
         margin-top: 40px;
         letter-spacing: 0.5px; /* mengurangi jarak antar huruf */
+    }
+    .book-card {
+        overflow: hidden;
+        position: relative;
+    }
+    .book-cover {
+        width: 100%;
+        max-height: 300px;
+        display: block;
+        margin: 0 auto;
+        transition: transform .2s;
+    }
+    .book-card:hover .book-cover {
+        transform: scale(1.1);
     }
 </style>
 {% endblock %}
@@ -38,21 +52,16 @@
     <div class="row">
         {% for book in books %}
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                <div class="card h-100 shadow d-flex">
-                    <img data-isbn="{{ book.ISBN }}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover;">
-                    <!-- <img class="card-img-left thumbnail" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover;" data-isbn="{{ book.ISBN }}"> -->
-                    <!-- <img id="cover-{{ book.id }}" class="card-img-left" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover;"> -->
+                <div class="card h-100 shadow book-card">
+                    <img data-isbn="{{ book.ISBN }}" class="book-cover thumbnail" alt="Book Cover">
                     <div class="card-body">
-                        <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px; ">
+                        <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px;">
                             <a href="/collections/detail_buku/{{ book.pk }}">{{ book.title }}</a>
                         </h5>
                         <p class="card-text" style="font-weight: 400;">{{ book.author }}</p>
                     </div>
                 </div>
             </div>
-            <script>
-                getCover('{{ book.ISBN }}');
-            </script>
         {% empty %}
             <div class="col-12">
                 <p class="text-center">No books available.</p>
@@ -60,22 +69,29 @@
         {% endfor %}
     </div>
 </div>
-{% endblock %}
 
 <script>
-    function getCover(isbn) {
-        const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn;
-        fetch(url, {
-            method: 'GET',
-        }).then(response => response.json())
-            .then(response => {
-                if (response.items && response.items.length > 0) {
-                    var item = response.items[0];
-                    var thumb = item.volumeInfo.imageLinks.thumbnail;
-                    let imgZoom = thumb.replace('zoom=1', 'zoom=6');
-                    let imgHttps = imgZoom.replace('http', 'https');
-                    document.querySelector(`img[data-isbn="${isbn}"]`).setAttribute('src', imgHttps);
-                }
-            });
+    function getCover() {
+        var thumbnails = document.querySelectorAll('.thumbnail');
+        thumbnails.forEach(function(thumbnail) {
+            var isbn = thumbnail.getAttribute('data-isbn');
+            const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn;
+            fetch(url, {
+                method: 'GET',
+            }).then(response => response.json())
+                .then(response => {
+                    if (response.items && response.items.length > 0) {
+                        var item = response.items[0];
+                        var thumb = item.volumeInfo.imageLinks.thumbnail;
+                        let imgZoom = thumb.replace('zoom=1', 'zoom=6');
+                        let imgHttps = imgZoom.replace('http', 'https');
+                        thumbnail.setAttribute('src', imgHttps);
+                    }
+                });
+        });
     }
+
+    // Panggil fungsi getCover setelah semua elemen thumbnail di-load
+    window.addEventListener('load', getCover);
 </script>
+{% endblock %}
