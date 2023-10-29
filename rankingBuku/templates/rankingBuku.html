@@ -63,7 +63,7 @@
         mybooklists.forEach((mybooklist) => {            
             htmlString += `
             <div class="col-md-3">
-                <div class="card custom-card" data-list-id="${mybooklist.pk}"> <!-- Set the data-list-id attribute here -->
+                <div class="card custom-card" data-list-id="${mybooklist.pk}"> 
                     <img src=${mybooklist.fields.image} id="cover-${mybooklist.pk}" class="card-img-center" alt="Book Cover" style="height: 200px; width: 50%; object-fit: cover; >
                     <div class="card-body">
                         <h5 class="card-title text-truncate" style="font-family: Nunito, sans-serif; font-size: 20px;  font-weight: 600; letter-spacing: 0.5px;">${mybooklist.fields.name}</h5>
@@ -91,7 +91,6 @@
 
         let htmlString = '<div class="row">';
         booklists.forEach((booklist) => {
-            const imageUrl = "{% if booklist.fields.image %}{{ booklist.fields.image.url }}{% else %}/static/default_image.png{% endif %}";
             htmlString += `
             <div class="col-md-3">
                 <div class="card custom-card" data-list-id="${booklist.pk}"> <!-- Set the data-list-id attribute here -->
