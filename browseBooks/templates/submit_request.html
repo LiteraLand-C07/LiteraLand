@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 
 {% block nav %}
+        {% if user.is_superuser %}
+        <li class="nav-item">
+            <a class="nav-link my-2 my-lg-0" href="{% url 'administrator:admin_page' %}">Administration</a>
+        </li>
+        {% endif %}
         <li class="nav-item">
             <a class="nav-link" href="/collections/">My Collection</a>
         </li>
