@@ -83,7 +83,7 @@
         <div class="modal-content fw-bold">
             <div class="modal-header" id="modal-header"></div>
             <div class="modal-body">
-                <form id="form-collection" onsubmit="return false;">
+                <form id="form-collection" method="POST">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="rating" class="col-form-label">Rating:</label>
@@ -97,9 +97,10 @@
                       <label for="status_baca" class="col-form-label">Status:</label>
                       <select class="form-control" id="status_baca" name="status_baca"></select>
                     </div>
+                    <div class="mb-3 d-flex justify-content-end gap-3" id="modal-footer"></div>
                 </form>
             </div>
-            <div class="modal-footer" id="modal-footer"></div>
+           
         </div>
     </div>
 </div>
@@ -128,7 +129,6 @@
 
     // Tampilkan cover ketika petama kali diakses
     getCover()
-
 
     async function getBookCollection(){
         var idBook = document.querySelector('.book').getAttribute('book-id')
@@ -163,6 +163,9 @@
             let buttonHTML = ''
 
             if (books.length == 0){
+                document.getElementById("form-collection").removeEventListener('submit',editCollection)
+                document.getElementById("form-collection").addEventListener('submit',addCollection)
+
                 modalHeader += `
                 <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Add to MyCollection</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -183,7 +186,7 @@
 
                 modalFooter += `
                 <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="addCollection()">Add</button>
+                <button type="submit" class="btn btn-dark" id="button_add" data-bs-dismiss="modal">Add</button>
                 `
 
                 buttonHTML += `
@@ -193,6 +196,9 @@
 
             } else {
                 const book = books[0];  
+
+                document.getElementById("form-collection").removeEventListener('submit',addCollection)
+                document.getElementById("form-collection").addEventListener('submit',editCollection)
 
                 modalHeader += `
                 <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Edit Collection</h1>
@@ -215,7 +221,7 @@
 
                 modalFooter += `
                 <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-dark" id="button_add" data-bs-dismiss="modal" onclick="editCollection()">Edit</button>
+                <button type="submit" class="btn btn-dark" id="button_add" data-bs-dismiss="modal">Edit</button>
                 `
 
                 buttonHTML += `
@@ -253,6 +259,7 @@
     }
 
     function addCollection(){
+        event.preventDefault();
         var formData = new FormData(document.querySelector('#form-collection'))
         var rating = formData.get('rating');
         var current_page = formData.get('current_page');
@@ -274,6 +281,7 @@
 
 
     async function editCollection(){
+        event.preventDefault()
         var formData = new FormData(document.querySelector('#form-collection'))
         var rating = formData.get('rating');
         var current_page = formData.get('current_page');
