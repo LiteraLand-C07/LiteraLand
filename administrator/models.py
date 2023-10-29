@@ -14,8 +14,3 @@ class BookQueue(models.Model):
     language = models.CharField(max_length=255)
     published_date = models.DateField()
 
-class Log(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
-    ISBN = models.CharField(max_length=13)
-    date_created = models.DateField()

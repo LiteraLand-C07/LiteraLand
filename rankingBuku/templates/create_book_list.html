@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+
+{% block meta %}
+<style>
+  .grid-container-element { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    grid-gap: 20px; 
+    width: 100%; 
+  } 
+
+  .grid-child-element { 
+      margin: 10px; 
+  }
+</style>
+
+{% endblock meta %}
+
+
+{% block link %}
+
+{% endblock link %}
+
+
+{% block content %}
+<body>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="grid-container-element"> 
+      <div class="grid-child-element">
+        <label for="{{ form.name.id_for_label }}">Name:</label>
+        <input type="text" id="{{ form.name.id_for_label }}" name="{{ form.name.name }}" value="{{ form.name.value }}">
+        <br>
+        <label for="id_access">Access:</label>
+        <select id="id_access" name="access">
+            <option value="public" {% if form.access.value == 'public' %}selected{% endif %}>Public</option>
+            <option value="private" {% if form.access.value == 'private' %}selected{% endif %}>Private</option>
+        </select>
+      </div>
+
+      <div class="grid-child-element">
+        <label for="{{ form.description.id_for_label }}">Description:</label>
+        <textarea id="{{ form.description.id_for_label }}" name="{{ form.description.name }}">{{ form.description.value }}</textarea>
+      </div>
+    </div>
+    
+    
+    <fieldset>
+      <legend>Books:</legend>
+      {% for book in form.books.field.queryset %}
+          <input type="checkbox" id="book_{{ book.id }}" name="books" value="{{ book.id }}"
+                 {% if book.id in form.books.value %}checked{% endif %}>
+          <label for="book_{{ book.id }}">{{ book.title }}</label><br>
+      {% endfor %}
+    </fieldset>
+    
+    <label for="id_image">Cover Image:</label>
+    <input type="file" id="id_image" name="image">
+    
+    <input type="submit" value="Submit">
+
+</form>
+</body>
+
+{% endblock content %}

@@ -6,12 +6,14 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Avg
 from django.contrib.auth.decorators import login_required
-from .forms import SearchForm
+from .forms import SearchForm,BookCollectionForm
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 def show_detail_buku(request,id):
     book = Book.objects.get(pk=id)
     average_rating = BookCollection.objects.filter(book=book, rating__gt=0).aggregate(Avg('rating'))['rating__avg']
+    form = BookCollectionForm()
 
     context = {
         'book':book,
@@ -19,6 +21,7 @@ def show_detail_buku(request,id):
         'StatusBaca':StatusBaca,
         'range':range(1,11),
         'user':request.user,
+        'form':form,
     }
 
     return render(request,'detail_buku.html',context)
@@ -30,13 +33,14 @@ def get_collection_json(request,id):
 
 @csrf_exempt
 def add_collection(request,id):
-    if request.method == 'POST':
-        book_data = Book.objects.get(pk=id)
-        rating = request.POST.get('rating')
-        current_page = request.POST.get('current_page')
-        status_baca = request.POST.get('status_baca')
+    form = BookCollectionForm(request.POST)
 
-        new_collection = BookCollection(user=request.user,book=book_data,rating=rating,current_page=current_page,status_baca=status_baca)
+    if form.is_valid() and request.method == 'POST':
+        book_data = Book.objects.get(pk=id)
+        new_collection = form.save(commit=False)
+        new_collection.user = request.user
+        new_collection.book = book_data
+
         new_collection.save()
 
         return HttpResponse(b"CREATED", status=201)
@@ -45,18 +49,15 @@ def add_collection(request,id):
 
 @csrf_exempt
 def edit_collection(request,id):
+    bookCollection = BookCollection.objects.get(pk=id)
+
     if request.method == 'POST':
-        bookCollection = BookCollection.objects.get(pk=id)
-        rating = request.POST.get('rating')
-        current_page = request.POST.get('current_page')
-        status_baca = request.POST.get('status_baca')
+        form = BookCollectionForm(request.POST, instance=bookCollection)
+        if form.is_valid():
+            edited_item = form.save(commit=False)
+            edited_item.save()
 
-        bookCollection.rating = rating
-        bookCollection.current_page = current_page
-        bookCollection.status_baca = status_baca
-        bookCollection.save()
-
-        return HttpResponse(b"EDITED", status=201)
+            return HttpResponse(b"EDITED", status=201)
     
     return HttpResponseNotFound() 
 
