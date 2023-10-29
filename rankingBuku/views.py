@@ -12,8 +12,10 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 def show_book_lists(request):
     book_lists = ListBook.objects.all()
+    my_booklists = ListBook.objects.filter(user=request.user)
     context = {
-        'book_lists': book_lists
+        'book_lists': book_lists,
+        'my_booklists' : my_booklists
     }
     return render(request, 'rankingBuku.html', context)
 

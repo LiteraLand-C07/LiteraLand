@@ -17,21 +17,22 @@
 
 {% endblock meta %}
 
-
 {% block link %}
+<style>
+  body{
+    background-color: #2C343F;
+  }
+</style>
 
 {% endblock link %}
 
-
 {% block content %}
 <body>
-<form method="post">
+<form method="post" style="color: #AABBCC;">
     {% csrf_token %}
       {{ form.as_p }}
-      <tr>
-          <td>
-              <input type="submit" value="Add Product"/>
-          </td>
+        <input type="submit" value="Add Product"/>
+        </td>
 </form>
 </body>
 
