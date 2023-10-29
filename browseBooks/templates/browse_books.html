@@ -68,7 +68,7 @@
         {% for book in books %}
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card h-100 shadow book-card">
-                    <img data-isbn="{{ book.ISBN }}" class="book-cover thumbnail" alt="Book Cover">
+                    <img src="https://i.imgur.com/CFVTM7y.png" data-isbn="{{ book.ISBN }}" class="book-cover thumbnail" alt="Book Cover">
                     <div class="card-body">
                         <h5 class="card-title text-truncate" style="font-weight: 600; letter-spacing: 0.5px;">
                             <a href="/collections/detail_buku/{{ book.pk }}">{{ book.title }}</a>
