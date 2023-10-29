@@ -15,7 +15,7 @@ import json
 def admin_page(request):
     if request.user.is_superuser:
         form = QueueForm()
-        book_request = BookRequest.objects.filter(user=request.user).order_by("-pk")
+        book_request = BookRequest.objects.all().order_by("-pk")
 
         context = {
             'form': form,
