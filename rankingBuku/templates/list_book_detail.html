@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block link %}
+
 <style>
     .custom-card {
         width: 125px;
@@ -10,25 +11,77 @@
         display: inline-block;
         text-align: center;
         box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.1);
+        background-color: #AABBCC;
     }
     .custom-card img {
         max-width: 100%;
         max-height: 100%;
     }
+
+    .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Styles for the close button */
+    .close {
+        color: #888;
+        float: right;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    body{
+        background-color: #2C343F;
+    }
 </style>
 {% endblock link %}
 
+{% block nav %}
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:logout' %}">Logout</a>
+    </li>
+{% endblock nav %}
+
 {% block content %}
+<body>
+
+<div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <p>Are you sure you want to delete this item?</p>
+            <button id="confirmDelete">Delete</button>
+        </div>
+</div>
+
 <div id="list-book-detail">
-    <p>{{listbook.id}}</p>
+    <br>
     <div class="container">
         <div class="row">
             <div class="col-lg-9">
                 <div class="left-content">
-                    <h6>List by {{ listbook.user }} </h6>
-                    <div class="title-intro">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h6 style="color: #AABBCC;">List by {{ listbook.user }} </h6>
+                        <a style="color: #AABBCC;" href="#" id="deleteLink">Delete Booklist</a>
+                    </div>
+                    <div class="title-intro" style="color: white;" >
                         <h1> {{ listbook.name }}</h1>
-                        <div class="body-text"> 
+                        <div class="body-text" style="font-family: 'TiemposTextWeb-Reguler', 'Georgia', 'Times New Roman', Times, serif; font-size: 16px; color: #99AABB;"> 
                             <p> {{ listbook.description }}</p>
                         </div>
                     </div>
@@ -37,10 +90,8 @@
                             {% for book in listbook.books.all %}
                             <div class="col-md-3">
                                 <div class="card custom-card">
-                                    <img src="imageUrl" alt="Book Cover">
-                                    <div class="card-footer">
-                                    <p class="card-text">{{book.title}}</p>
-                                    </div>
+                                    <img src="" class="img-fluid rounded-start thumbnail" alt="{{book.title}} cover" data-isbn="{{book.ISBN}}" style="width: 100%;height: 100%;">
+                                    <p class="card-text text-truncate">{{book.title}}</p>
                                 </div>
                             </div>
                             {% endfor %}
@@ -52,4 +103,78 @@
     </div>
 </div>
 
+<script>
+    function getCover() {
+        var thumbnails = document.querySelectorAll('.thumbnail');
+        thumbnails.forEach(function(thumbnail) {
+            var isbn = thumbnail.getAttribute('data-isbn');
+            const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn;
+            fetch(url, {
+                method: 'GET',
+            }).then(response => response.json())
+                .then(response => handleResponse(response, thumbnail))
+        });
+    }
+
+    function handleResponse(response, thumbnail) {
+        var item = response.items[0];
+        var thumb = item.volumeInfo.imageLinks.thumbnail;
+        let imgZoom = thumb.replace('zoom=1', 'zoom=6')
+        let imgHttps = imgZoom.replace('http', 'https');
+        thumbnail.setAttribute('src', imgHttps);
+    }
+
+    getCover()
+
+    var modal = document.getElementById('deleteModal');
+    var deleteLink = document.getElementById('deleteLink');
+    var closeModal = document.getElementById('closeModal');
+    var confirmDelete = document.getElementById('confirmDelete');
+
+    // When the user clicks the delete link, show the modal
+    deleteLink.addEventListener('click', function() {
+        modal.style.display = 'block';
+    });
+
+    // When the user clicks the close button or outside the modal, hide the modal
+    closeModal.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    // When the user clicks the "Delete" button, you can perform your delete action here
+    confirmDelete.addEventListener('click', function() {
+        // You can use the fetch API to send an AJAX request
+        fetch('/delete_item/', {
+            method: 'POST', // Use POST or DELETE, depending on your preference
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+            body: JSON.stringify({ item_id: '{{booklist.id}}' }), // Pass the item ID to delete
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response from the server, e.g., show a success message or reload the page
+            if (data.success) {
+                alert('Item deleted successfully.');
+                modal.style.display = 'none'; // Close the modal
+            } else {
+                alert('Error deleting item.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+
+    // Close the modal when the user clicks outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+</script>
+</body>
 {% endblock %}
