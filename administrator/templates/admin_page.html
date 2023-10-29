@@ -7,6 +7,26 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 {% endblock link %}
 
+{% block nav %}
+    {% if user.is_superuser %}
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="{% url 'administrator:admin_page' %}">Administration</a>
+    </li>
+    {% endif %}
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="/">Browse Book</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/collections/">My Collection</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="/rankingBuku/">Ranking</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:logout' %}">Logout</a>
+    </li>
+{% endblock nav %}
+
 {% block content %}
 <div class="modal fade" id="messageModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog">
@@ -37,7 +57,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success mx-auto" onclick="copyToForm()">Copy To Form</button>
-                <button id="Delete" type="button" class="btn btn-danger mx-auto" data-bs-dismiss="modal">Delete Message</button>
+                <button id="Delete" type="button" class="btn btn-danger mx-auto" data-bs-dismiss="modal">Delete Request</button>
             </div>
         </div>
     </div>
@@ -160,11 +180,14 @@
 
     async function getCover(ISBN){
         const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + ISBN
-        book = await fetch(url, {
+        return fetch(url, {
                 method: 'GET',
-        }).then(response => response.json()).then(data => data.items[0])
+        }).then(response => response.json()).then(data => data.items[0]).then(book => {
+            return book.volumeInfo.imageLinks.thumbnail
+        }).catch(error => {
+            return ""
+        })
 
-        return book.volumeInfo.imageLinks.thumbnail
     }
 
     async function setFilter(){
