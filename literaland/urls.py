@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path,include
 from browseBooks.views import browse_books
 from django.contrib.auth import views as auth_views
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,8 +28,8 @@ urlpatterns = [
     path('authentication/',include('shared_models.urls')),
     path('administrator/', include('administrator.urls')),
     path('', include('browseBooks.urls')),
-    # path('browse/', browse_books, name='browse_books'),
-    # path('browse/', include('browseBooks.urls')),
-    # path('', browse_books, name='home'),
-    # path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+    path('rankingBuku/', include('rankingBuku.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
