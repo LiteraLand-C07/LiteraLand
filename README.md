@@ -1,4 +1,7 @@
 # :books: LiteraLand
+Link Website: http://literaland-c07-tk.pbp.cs.ui.ac.id/ <br>
+<br>
+<img alt="pipeline status" src="https://img.shields.io/github/actions/workflow/status/LiteraLand-C07/LiteraLand/pbp-deploy.yml?branch=main">
 
 ## :busts_in_silhouette: Nama Anggota :busts_in_silhouette:
 - Caesar Syahru Ramadhan
