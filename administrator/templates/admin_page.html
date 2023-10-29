@@ -112,16 +112,16 @@
         <div class="col-9 px-0">
             <div class="container-fluid px-4" style="height: calc(100vh - 56px); overflow: auto;">
                 <div class="card mx-auto mt-4 mb-5 bg-secondary-subtle" style="width: 80%;">
-                    <div class="card body bg-secondary-subtle">
+                    <div class="card body pb-3 bg-secondary-subtle">
                         <h4 class="card-title mx-auto mt-3">Enter Book Information</h4>
-                        <form class="mx-3 mt-3 mb-5" id="CreateBookForm">
+                        <form class="mx-3 mt-3 mb-3" id="CreateBookForm">
                             {% csrf_token %}
                             <table>
                                 {{form.as_table}}
                             </table>
                         </form>
-                        <p class="mx-auto" id="invalid">Form Invalid</p>
-                        <p class="mx-auto" id="exist">Book Already Exist</p>
+                        <p class="mx-auto my-0" id="invalid">Form Invalid</p>
+                        <p class="mx-auto my-0" id="exist">Book Already Exist</p>
                         <script>
                             $('table').css("width", "90%")
                             $('table').addClass("mx-auto")
@@ -135,7 +135,6 @@
                         <button type="button" class="btn btn-primary" onclick="addQueue()">Add To Queue</button>
                     </div>
                 </div>
-                <br>
                 <div class="container-fluid">
                     <form id="FilterForm" class="d-flex">
                         {% csrf_token %}
