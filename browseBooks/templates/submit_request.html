@@ -1,71 +1,47 @@
+{% extends 'base.html' %}
 
-
-{% block meta %}
-<title>Submit Request</title>
-{% endblock meta %}
-
-{% block link %}
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f4f4f4;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .submit-icon {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        h2 {
-            color: #333;
-            margin: 0 0 20px;
-            text-align: center;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-        input, button {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 3px;
-            border: 1px solid #ddd;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-{% endblock link %}
+{% block nav %}
+        <li class="nav-item">
+            <a class="nav-link" href="/collections/">My Collection</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/rankingBuku/">Ranking</a>
+        </li>
+        <!-- Jika pengguna telah login -->
+        {% if user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'shared_models:logout' %}">Logout</a>
+            </li>
+        {% else %} 
+        <!-- Jika pengguna belum login -->
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'shared_models:login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'shared_models:register' %}">Register</a>
+            </li>
+        {% endif %}
+    {% endblock nav %}
 
 {% block content %}
-    <div class="container">
-        <h2>Submit Request</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Submit Request</button>
-        </form>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-dark text-white"> <!-- Merubah warna header card menjadi hitam -->
+                        <h4 class="mb-0">Submit Request</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Submit Request</button> <!-- Merubah warna tombol menjadi biru -->
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-
-{% endblock %}
+{% endblock content %}

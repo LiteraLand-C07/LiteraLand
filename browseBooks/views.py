@@ -5,6 +5,8 @@ from shared_models.models import Book
 from .forms import BookRequestForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from .models import BookRequest  # Ganti dengan nama model request buku yang sesuai
 
 
 def browse_books(request):
@@ -29,3 +31,14 @@ def submit_book_request(request):
 
 def success_page(request):
     return render(request, 'success_page.html')
+
+
+def book_requests_json(request):
+    # Memastikan pengguna telah login
+    if request.user.is_authenticated:
+        # Mengambil request buku yang dibuat oleh pengguna yang sedang login
+        requests = list(BookRequest.objects.filter(user=request.user).values('title', 'author', 'description'))
+        return JsonResponse(requests, safe=False)  # Mengembalikan data dalam format JSON
+    else:
+        # Jika pengguna tidak login, kembalikan JSON kosong atau pesan error
+        return JsonResponse({'error': 'User not authenticated'}, status=401)

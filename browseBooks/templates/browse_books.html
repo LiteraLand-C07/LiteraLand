@@ -1,16 +1,25 @@
 {% extends 'base.html' %}
 
     {% block nav %}
-        <!-- nanti tambahin buat fungsi/modul masing2 -->
-        <!-- untuk sekarang belom ada fungsionalitasnya, baru tombol -->
         <li class="nav-item">
             <a class="nav-link" href="/collections/">My Collection</a>
         </li>
-        <!-- Logout Button (only visible if user is logged in) -->
-        {% if user.is_authenticated %}
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'shared_models:logout' %}">Logout</a>
+            <a class="nav-link" href="/rankingBuku/">Ranking</a>
         </li>
+        <!-- Jika pengguna telah login -->
+        {% if user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'shared_models:logout' %}">Logout</a>
+            </li>
+        {% else %} 
+        <!-- Jika pengguna belum login -->
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'shared_models:login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'shared_models:register' %}">Register</a>
+            </li>
         {% endif %}
     {% endblock nav %}
 
