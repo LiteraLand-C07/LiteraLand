@@ -272,6 +272,7 @@ body.dark-mode .button-contactForm{
 
         $(".delete-review-btn").on("click", function() {
             const reviewId = $(this).data("review-id");
+            const reviewCard = $(this).closest(".col-md-4");  // Select the closest card container to the delete button
 
             $.ajax({
                 headers: { "X-CSRFToken": '{{ csrf_token }}' },
@@ -283,7 +284,7 @@ body.dark-mode .button-contactForm{
                 success: function(response) {
                     if (response.status === 'success') {
                         alert(response.message);
-                        location.reload(); // reload the page or remove the review div
+                        reviewCard.remove();  // Remove the review card from the DOM
                     } else {
                         alert(response.message);
                     }
