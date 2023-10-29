@@ -29,11 +29,12 @@
     <li class="nav-item">
         <a class="nav-link my-2 my-lg-0" href="/collections/">MyCollections</a>
     </li>
-
-    {% if user.is_authenticated %}
     <li class="nav-item">
         <a class="nav-link my-2 my-lg-0" href="/rankingBuku/">Ranking</a>
     </li>
+
+    {% if user.is_authenticated %}
+    
     <li class="nav-item">
         <a class="nav-link my-2 my-lg-0" href="{% url 'shared_models:logout' %}">Logout</a>
     </li>
