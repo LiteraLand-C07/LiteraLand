@@ -32,6 +32,7 @@ urlpatterns = [
     path('browse/', include('browseBooks.urls')),
     path('', browse_books, name='home'),
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+    path('', include('browseBooks.urls')),
 ]
 
 if settings.DEBUG:

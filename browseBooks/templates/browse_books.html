@@ -1,5 +1,26 @@
 {% extends 'base.html' %}
 
+    {% block nav %}
+        <!-- nanti tambahin buat fungsi/modul masing2 -->
+        <!-- untuk sekarang belom ada fungsionalitasnya, baru tombol -->
+        <li class="nav-item">
+            <a class="nav-link" href="#">My Collection</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Ranking</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Book Review</a>
+        </li>
+        <!-- Logout Button (only visible if user is logged in) -->
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+        </li>
+        {% endif %}
+    {% endblock nav %}
+
+    
 
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
