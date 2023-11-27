@@ -3,9 +3,12 @@ from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages  
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 import datetime
+from shared_models.models import Book
+from django.core import serializers
+
 
 # Create your views here.
 def register(request):
@@ -51,3 +54,7 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse('shared_models:login'))
     response.delete_cookie('last_login')
     return response
+
+def book_json(request):
+    book = Book.objects.all()
+    return HttpResponse(serializers.serialize("json", book), content_type = "application/json")
