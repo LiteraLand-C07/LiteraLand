@@ -29,6 +29,7 @@ urlpatterns = [
     path('administrator/', include('administrator.urls')),
     path('', include('browseBooks.urls')),
     path('rankingBuku/', include('rankingBuku.urls')),
+    path('auth/', include('authentication.urls')),
 ]
 
 if settings.DEBUG:
