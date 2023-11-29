@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from shared_models.models import Book
 from bookcollections.models import BookCollection, StatusBaca
@@ -7,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Avg
 from django.contrib.auth.decorators import login_required
 from .forms import SearchForm,BookCollectionForm
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
 
 # Create your views here.
 def show_detail_buku(request,id):
@@ -212,3 +213,56 @@ def read_book_content(request,id):
     }
 
     return render(request,'read_book.html',context)
+
+@csrf_exempt
+def get_json(request):
+    data = BookCollection.objects.all()
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+@csrf_exempt
+def get_json_by_user(request,username):
+    user = User.objects.get(username = username)
+    data = BookCollection.objects.filter(user = user)
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+@csrf_exempt
+def create_collection_flutter(request,id):
+    if request.method == 'POST':
+        
+        data = json.loads(request.body)
+        book_data = Book.objects.get(pk=id)
+
+        new_product = BookCollection.objects.create(
+            user = request.user,
+            book = book_data,
+            rating = data["rating"],
+            current_page = int(data["current_page"]),
+            status_baca = data["status_baca"]
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
+def edit_collection_flutter(request,id):
+    if request.method == 'POST':
+
+        data = json.loads(request.body)
+        bookCollection = BookCollection.objects.get(pk=id)
+
+        new_rating = data["rating"],
+        new_current_page = int(data["current_page"]),
+        new_status_baca = data["status_baca"]
+
+        bookCollection.rating = new_rating
+        bookCollection.current_page = new_current_page
+        bookCollection.status_baca = new_status_baca
+
+        bookCollection.save()
+        
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
