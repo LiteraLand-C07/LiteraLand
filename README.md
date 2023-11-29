@@ -5,7 +5,7 @@ Link Website: http://literaland-c07-tk.pbp.cs.ui.ac.id/ <br>
 
 ## :busts_in_silhouette: Nama Anggota :busts_in_silhouette:
 - Caesar Syahru Ramadhan
-- M. Alif Al Hakim
+- M.Alif Al Hakim
 - Farrel Muhammad Hanau
 - Michelle Angelica Santoso
 - Salma Nurul ‘Aziz
@@ -25,7 +25,7 @@ Pada modul ini akan ditampilkan semua buku yang terdapat di database projek. Sel
 ### :bookmark: Modul Koleksi Buku :bookmark:
 Pada modul ini `user` dapat menambahkan semua buku yang ingin mereka tambahkan ke daftar koleksi. `User` dapat menambahkan buku dengan meng-click buku pada halaman browse buku lalu menambahkannya ke daftar koleksi dengan menekan tombol `Add to Collections`. Pada modul ini `user` dapat menyimpan progres baca, status baca, dan rating dari buku yang ada pada daftar koleksi mereka. Selain itu, mereka dapat membaca buku yang ada dalam daftar koleksi mereka.
 
-### :star: Model Ranking :star:
+### :star: Modul Ranking :star:
 Pada modul ini setiap `user` dapat memposting daftar buku favorite menurut pendapat mereka. Selain itu, pada modul ini `user` juga dapat melihat list buku favorite dari user lain sehingga dapat menjadi referensi untuk membaca buku lain.
 
 ### :page_with_curl: Model Review Buku :page_with_curl:
