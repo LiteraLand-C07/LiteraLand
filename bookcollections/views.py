@@ -27,6 +27,26 @@ def show_detail_buku(request,id):
 
     return render(request,'detail_buku.html',context)
 
+def get_detail_json(request,id):
+    book = Book.objects.get(pk=id)
+    average_rating = BookCollection.objects.filter(book=book, rating__gt=0).aggregate(Avg('rating'))['rating__avg']
+    item = {
+        'rating' : average_rating,
+        'title' : book.title,
+        'author' : book.author,
+        'publisher': book.publisher,
+        'page_count' : book.page_count,
+        'genre':book.genre,
+        'ISBN': book.ISBN,
+        'language':book.language,
+        'published_date' : book.published_date,
+        'description':book.description,
+    }
+    data = []
+    data.append(item)
+
+    return JsonResponse(data, safe=False)
+
 def get_collection_json(request,id):
     book = Book.objects.get(pk=id)
     book_collection = BookCollection.objects.filter(book=book,user=request.user)
@@ -213,17 +233,6 @@ def read_book_content(request,id):
     }
 
     return render(request,'read_book.html',context)
-
-@csrf_exempt
-def get_json(request):
-    data = BookCollection.objects.all()
-    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
-
-@csrf_exempt
-def get_json_by_user(request,username):
-    user = User.objects.get(username = username)
-    data = BookCollection.objects.filter(user = user)
-    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
 
 @csrf_exempt
 def create_collection_flutter(request,id):

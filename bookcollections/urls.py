@@ -1,5 +1,5 @@
 from django.urls import path
-from bookcollections.views import show_detail_buku,add_collection,get_collection_json,edit_collection,show_collections,add_current_page,add_ten_current_page,decrease_current_page,decrease_ten_current_page,edit_rating_collection,edit_status_collection,get_collections_json,delete_collection,read_book_content,get_json,get_json_by_user,create_collection_flutter,edit_collection_flutter
+from bookcollections.views import show_detail_buku,add_collection,get_collection_json,edit_collection,show_collections,add_current_page,add_ten_current_page,decrease_current_page,decrease_ten_current_page,edit_rating_collection,edit_status_collection,get_collections_json,delete_collection,read_book_content,create_collection_flutter,edit_collection_flutter,get_detail_json
 
 app_name = 'bookcollections'
 
@@ -18,8 +18,7 @@ urlpatterns = [
     path('edit_status_collection/<int:id>/<str:new_status>/',edit_status_collection,name="edit_status_collection"),
     path('delete_collection/<int:id>/',delete_collection,name="delete_collection"),
     path('read_book_content/<int:id>/',read_book_content,name="read_book_content"),
-    path('json/',get_json,name="get_json"),
-    path('json/<str:username>/',get_json_by_user,name="get_json_by_user"),
     path('create_flutter/<int:id>/',create_collection_flutter,name="create_collection_flutter"),
     path('edit_flutter/<int:id>',edit_collection_flutter,name="edit_collection_flutter"),
+    path('get_detail_json/<int:id>/',get_detail_json,name="get_detail_json"),
 ]
