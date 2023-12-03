@@ -112,23 +112,23 @@
         <div class="col-9 px-0">
             <div class="container-fluid px-4" style="height: calc(100vh - 56px); overflow: auto;">
                 <div class="card mx-auto mt-4 mb-5 bg-secondary-subtle" style="width: 80%;">
+                    <div class="card-header text-center">
+                        <p class="fs-4 mx-auto mt-3">Enter Book Information</p>
+                    </div>
                     <div class="card body pb-3 bg-secondary-subtle">
-                        <h4 class="card-title mx-auto mt-3">Enter Book Information</h4>
                         <form class="mx-3 mt-3 mb-3" id="CreateBookForm">
                             {% csrf_token %}
-                            <table>
-                                {{form.as_table}}
-                            </table>
+                            {{form.as_p}}
                         </form>
                         <p class="mx-auto my-0" id="invalid">Form Invalid</p>
                         <p class="mx-auto my-0" id="exist">Book Already Exist</p>
                         <script>
-                            $('table').css("width", "90%")
-                            $('table').addClass("mx-auto")
-                            $("table label").addClass("col-form-label")
-                            $("table input").addClass("form-control")
-                            $("table textarea").addClass("form-control")
-                            $("table textarea").attr("rows", "5")
+                            // $('table').css("width", "90%")
+                            $('form p').addClass("mx-auto")
+                            $("form p label").addClass("col-form-label")
+                            $("form p input").addClass("form-control")
+                            $("form p textarea").addClass("form-control")
+                            $("form p textarea").attr("rows", "5")
                         </script>
                     </div>
                     <div class="card footer bg-secondary-subtle">
