@@ -130,3 +130,6 @@ def delete_request(request, id):
         return HttpResponse("Successfully Deleted Book Request")
     return HttpResponseBadRequest("Book Request doesn't exist or already deleted")
      
+def queues_json(request):
+    queue = BookQueue.objects.filter(user=request.user)
+    return HttpResponse(serializers.serialize("json", queue), content_type = "application/json")
