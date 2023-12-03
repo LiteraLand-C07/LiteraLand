@@ -1,5 +1,5 @@
 from django.urls import path
-from forumDiskusi.views import book_reviews, ajax_add_review, delete_review
+from forumDiskusi.views import book_reviews, ajax_add_review, delete_review, show_json
 from bookcollections.views import show_detail_buku
 from browseBooks.views import browse_books
 
@@ -12,4 +12,5 @@ urlpatterns = [
     path('delete_review/<int:book_id>/', delete_review, name='delete_review'),
     path('ajax_add_review/<int:pid>/',ajax_add_review, name='ajax_add_review'),
     path('browse_books/', browse_books, name='browse_books'),
+    path('show_json/', show_json, name='show_json'),
 ]

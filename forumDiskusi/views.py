@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 
 from shared_models.models import Book
 from .models import BookReview
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from shared_models.models import Book
@@ -11,6 +11,7 @@ from .models import BookReview
 from forumDiskusi.forms import BookReviewForm
 
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 
 @login_required
 def book_reviews(request, book_id):
@@ -48,8 +49,8 @@ def ajax_add_review(request, pid):
     return JsonResponse (
         {
             'bool':True,
-         'context':context
-         }
+            'context':context
+        }
     )
 
 def delete_review(request, book_id):
@@ -67,4 +68,9 @@ def delete_review(request, book_id):
                 return JsonResponse({'status': 'fail', 'message': 'Permission denied'})
         except BookReview.DoesNotExist:
             return JsonResponse({'status': 'fail', 'message': 'Review does not exist'})
-        
+
+# Endpoint baru untuk mengambil semua review dalam format JSON
+def show_json(request):
+    data = BookReview.objects.all()
+    reviews_json = serializers.serialize("json", data)
+    return JsonResponse(reviews_json, safe=False)
