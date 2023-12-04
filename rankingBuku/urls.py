@@ -1,5 +1,5 @@
 from django.urls import path
-from rankingBuku.views import show_book_lists, create_book_list, get_book_lists_json, list_book_detail, get_book_list_byid, get_my_book_lists, delete_listbook, get_books
+from rankingBuku.views import show_book_lists, create_book_list, get_book_lists_json, list_book_detail, get_book_list_byid, get_my_book_lists, delete_listbook, get_books, create_listbook_flutter
 
 urlpatterns = [
     path('', show_book_lists, name='book_lists'),
@@ -10,4 +10,5 @@ urlpatterns = [
     path('get_my_book_lists/', get_my_book_lists, name='get_my_book_lists'),
     path('delete_listbook/<int:id>', delete_listbook, name="delete_listbook"),
     path('get_books/', get_books, name='get_books'),
+    path('create_booklist_flutter/', create_listbook_flutter, name='create_listbook_flutter')
 ]

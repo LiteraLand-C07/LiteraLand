@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, redirect
 from rankingBuku.models import ListBook
 from rankingBuku.forms import ListBookForm
@@ -12,10 +13,8 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 def show_book_lists(request):
     book_lists = ListBook.objects.all()
-    my_booklists = ListBook.objects.filter(user=request.user)
     context = {
         'book_lists': book_lists,
-        'my_booklists' : my_booklists
     }
     return render(request, 'rankingBuku.html', context)
 
@@ -74,3 +73,26 @@ def delete_listbook(request, id):
     listbook = ListBook.objects.get(pk =id)
     listbook.delete()
     return HttpResponseRedirect(reverse('book_lists'))
+
+@csrf_exempt
+@login_required(login_url='/authentication/login')
+def create_listbook_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        new_product = ListBook.objects.create(
+            user=request.user,
+            name=data["fields"]["name"],
+            user=data["fields"]["user"],
+            description=data["fields"]["description"],
+            image=data["fields"]["image"],
+            # Additional fields
+            access=data["fields"]["access"],
+            books=data["fields"]["books"],
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
