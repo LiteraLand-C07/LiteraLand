@@ -83,7 +83,6 @@ def create_listbook_flutter(request):
         new_product = ListBook.objects.create(
             user=request.user,
             name=data["fields"]["name"],
-            user=data["fields"]["user"],
             description=data["fields"]["description"],
             image=data["fields"]["image"],
             # Additional fields
