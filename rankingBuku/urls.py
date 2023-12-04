@@ -10,5 +10,5 @@ urlpatterns = [
     path('get_my_book_lists/', get_my_book_lists, name='get_my_book_lists'),
     path('delete_listbook/<int:id>', delete_listbook, name="delete_listbook"),
     path('get_books/', get_books, name='get_books'),
-    path('create_booklist_flutter/', create_listbook_flutter, name='create_listbook_flutter')
+    path('create_listbook_flutter/', create_listbook_flutter, name='create_listbook_flutter')
 ]
