@@ -275,6 +275,16 @@ def edit_collection_flutter(request,id):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
+    
+@csrf_exempt
+def delete_collection_flutter(request,id):
+    if request.method == 'POST':
+        collection = BookCollection.objects.get(pk=id)
+        collection.delete()
+
+        return JsonResponse({"status": "success"}, status=200)
+    
+    return JsonResponse({"status": "error"}, status=401)
 
 def check_collection_json(request,id):
     book = Book.objects.get(pk=id)
