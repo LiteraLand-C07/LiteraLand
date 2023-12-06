@@ -275,3 +275,8 @@ def edit_collection_flutter(request,id):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
+
+def check_collection_json(request,id):
+    book = Book.objects.get(pk=id)
+    book_collection = BookCollection.objects.filter(book=book,user=request.user)
+    return HttpResponse(serializers.serialize("json", book_collection), content_type="application/json")
