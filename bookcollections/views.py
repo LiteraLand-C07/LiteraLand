@@ -244,7 +244,7 @@ def create_collection_flutter(request,id):
         new_product = BookCollection.objects.create(
             user = request.user,
             book = book_data,
-            rating = data["rating"],
+            rating = int(data["rating"]),
             current_page = int(data["current_page"]),
             status_baca = data["status_baca"]
         )
@@ -262,8 +262,8 @@ def edit_collection_flutter(request,id):
         data = json.loads(request.body)
         bookCollection = BookCollection.objects.get(pk=id)
 
-        new_rating = data["rating"],
-        new_current_page = int(data["current_page"]),
+        new_rating = int(data['rating'])
+        new_current_page = int(data["current_page"])
         new_status_baca = data["status_baca"]
 
         bookCollection.rating = new_rating
