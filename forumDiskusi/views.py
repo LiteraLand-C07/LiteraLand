@@ -72,5 +72,4 @@ def delete_review(request, book_id):
 # Endpoint baru untuk mengambil semua review dalam format JSON
 def show_json(request):
     data = BookReview.objects.all()
-    reviews_json = serializers.serialize("json", data)
-    return JsonResponse(reviews_json, safe=False)
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
