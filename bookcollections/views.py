@@ -235,6 +235,16 @@ def read_book_content(request,id):
     return render(request,'read_book.html',context)
 
 @csrf_exempt
+def read_book_content_flutter(request,id):
+    book = Book.objects.get(pk=id)
+
+    context = {
+        'book': book,
+    }
+
+    return render(request,'read_book_flutter.html',context)
+
+@csrf_exempt
 def create_collection_flutter(request,id):
     if request.method == 'POST':
         
