@@ -45,7 +45,6 @@ def get_book_list_json(request):
     booklists = ListBook.objects.filter(access__icontains='public')
     return HttpResponse(serializers.serialize('json', booklists))
 
-@login_required(login_url='/authentication/login')
 def get_my_book_lists(request):
     booklists = ListBook.objects.filter(user=request.user)
     return HttpResponse(serializers.serialize('json', booklists))
@@ -84,7 +83,7 @@ def create_booklist_flutter(request):
             user=request.user,
             name=data["name"],
             description=data["description"],
-            image="https://i.imgur.com/CFVTM7y.png",
+            image = "https://i.imgur.com/CFVTM7y.png",
             # Additional fields
             access=data["access"],
             books=data["books"],
