@@ -41,7 +41,7 @@ def create_book_list(request):
     context = {'form': form}
     return render(request, 'create_book_list.html', context)
 
-def get_book_lists_json(request):
+def get_book_list_json(request):
     booklists = ListBook.objects.filter(access__icontains='public')
     return HttpResponse(serializers.serialize('json', booklists))
 
@@ -76,18 +76,18 @@ def delete_listbook(request, id):
 
 @csrf_exempt
 @login_required(login_url='/authentication/login')
-def create_listbook_flutter(request):
+def create_booklist_flutter(request):
     if request.method == 'POST':
         data = json.loads(request.body)
 
         new_product = ListBook.objects.create(
             user=request.user,
-            name=data["fields"]["name"],
-            description=data["fields"]["description"],
-            image=data["fields"]["image"],
+            name=data["name"],
+            description=data["description"],
+            image="https://i.imgur.com/CFVTM7y.png",
             # Additional fields
-            access=data["fields"]["access"],
-            books=data["fields"]["books"],
+            access=data["access"],
+            books=data["books"],
         )
 
         new_product.save()
@@ -95,3 +95,18 @@ def create_listbook_flutter(request):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
+    
+def get_booklists_json(request):
+    booklists = ListBook.objects.filter(access__icontains='public')
+
+    data = []
+    for booklist in booklists:
+        item = {
+            'books': booklist.books,
+            'name':booklist.name,
+            'user': booklist.user,
+            'access': booklist.access,
+            'description': booklist.description,
+        }
+        data.append(item)
+    return JsonResponse(data, safe=False)
