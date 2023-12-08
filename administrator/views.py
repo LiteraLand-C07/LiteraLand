@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 import json
 
 # Create your views here.
@@ -133,3 +134,28 @@ def delete_request(request, id):
 def queues_json(request):
     queue = BookQueue.objects.filter(user=request.user)
     return HttpResponse(serializers.serialize("json", queue), content_type = "application/json")
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def create_queue_flutter(request):
+    if request.method == 'POST':
+        
+        data = json.loads(request.body)
+        new_item = BookQueue.objects.create(
+            user = request.user,
+            title = data["title"],
+            author = data["author"],
+            description = data["description"],
+            publisher = data["publisher"],
+            page_count = int(data["page_count"]),
+            genre = data["genre"],
+            ISBN = data["ISBN"],
+            language = data["language"],
+            published_date = data["published_date"]
+        )
+
+        new_item.save()
+
+        return HttpResponse("Successfully added book queue", status=200)
+    else:
+        return HttpResponseBadRequest("Failed to add book queue")
