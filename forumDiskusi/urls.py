@@ -1,5 +1,5 @@
 from django.urls import path
-from forumDiskusi.views import book_reviews, ajax_add_review, delete_review, show_json
+from forumDiskusi.views import book_reviews, ajax_add_review, delete_review, show_json, show_json_by_id, create_product_flutter
 from bookcollections.views import show_detail_buku
 from browseBooks.views import browse_books
 
@@ -13,4 +13,6 @@ urlpatterns = [
     path('ajax_add_review/<int:pid>/',ajax_add_review, name='ajax_add_review'),
     path('browse_books/', browse_books, name='browse_books'),
     path('show_json/', show_json, name='show_json'),
+    path('json_id/', show_json_by_id, name='show_json'),
+    path('create-flutter/', create_product_flutter, name='create_product_flutter'),
 ]

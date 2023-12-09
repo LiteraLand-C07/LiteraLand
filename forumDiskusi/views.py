@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
@@ -73,3 +74,27 @@ def delete_review(request, book_id):
 def show_json(request):
     data = BookReview.objects.all()
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+def show_json_by_id(request, id):
+    data = BookReview.objects.filter(pk=id)
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        
+        data = json.loads(request.body)
+
+        new_product = BookReview.objects.create(
+            user = request.user,
+            book = request.book,
+            reviewer_name = data["reviewer_name"],
+            star_rating = int(data["star_rating"]),
+            review = data["review"],
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
