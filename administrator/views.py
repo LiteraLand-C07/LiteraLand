@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from administrator.models import BookQueue
 from administrator.forms import QueueForm
 from shared_models.models import Book
@@ -156,6 +156,6 @@ def create_queue_flutter(request):
 
         new_item.save()
 
-        return HttpResponse("Successfully added book queue", status=200)
+        return JsonResponse({"status": "success"}, status=200)
     else:
-        return HttpResponseBadRequest("Failed to add book queue")
+        return JsonResponse({"status": "error"}, status=401)
