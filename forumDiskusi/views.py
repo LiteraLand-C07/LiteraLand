@@ -98,3 +98,14 @@ def create_product_flutter(request):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
+    
+from django.http import JsonResponse
+
+@login_required
+def book_reviews_id(request, book_id):
+    # existing logic to get reviews
+    reviews = BookReview.objects.filter(book_id=book_id).select_related('user')
+    
+    # Convert reviews to JSON
+    reviews_json = list(reviews.values('user__username', 'review', 'star_rating', 'reviewer_name', 'date'))
+    return JsonResponse({'reviews': reviews_json})
