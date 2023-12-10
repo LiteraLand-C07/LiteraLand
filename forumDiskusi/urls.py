@@ -14,7 +14,7 @@ urlpatterns = [
     path('ajax_add_review/<int:pid>/',ajax_add_review, name='ajax_add_review'),
     path('browse_books/', browse_books, name='browse_books'),
     path('show_json/', show_json, name='show_json'),
-    path('json_id/', show_json_by_id, name='show_json'),
+    path('json_id/<int:id>/', show_json_by_id, name='show_json_by_id'),
     path('create-flutter/', create_product_flutter, name='create_product_flutter'),
     path('book-reviews_id/<int:book_id>/', login_required(book_reviews_id), name='book_reviews_id'),
 ]
