@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -6,6 +7,7 @@ from .forms import BookRequestForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from .models import BookRequest  # Ganti dengan nama model request buku yang sesuai
 
 
@@ -42,3 +44,21 @@ def book_requests_json(request):
     else:
         # Jika pengguna tidak login, kembalikan JSON kosong atau pesan error
         return JsonResponse({'error': 'User not authenticated'}, status=401)
+
+
+@csrf_exempt
+@login_required(login_url='/authentication/login')
+def create_book_request_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        # Create a new BookRequest instance
+        new_book_request = BookRequest.objects.create(
+            user=request.user,  # Assuming the user is logged in
+            title=data["title"],
+            author=data["author"],
+            description=data["description"]
+        )
+        new_book_request.save()
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)

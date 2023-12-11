@@ -235,6 +235,16 @@ def read_book_content(request,id):
     return render(request,'read_book.html',context)
 
 @csrf_exempt
+def read_book_content_flutter(request,id):
+    book = Book.objects.get(pk=id)
+
+    context = {
+        'book': book,
+    }
+
+    return render(request,'read_book_flutter.html',context)
+
+@csrf_exempt
 def create_collection_flutter(request,id):
     if request.method == 'POST':
         
@@ -244,7 +254,7 @@ def create_collection_flutter(request,id):
         new_product = BookCollection.objects.create(
             user = request.user,
             book = book_data,
-            rating = data["rating"],
+            rating = int(data["rating"]),
             current_page = int(data["current_page"]),
             status_baca = data["status_baca"]
         )
@@ -262,8 +272,8 @@ def edit_collection_flutter(request,id):
         data = json.loads(request.body)
         bookCollection = BookCollection.objects.get(pk=id)
 
-        new_rating = data["rating"],
-        new_current_page = int(data["current_page"]),
+        new_rating = int(data['rating'])
+        new_current_page = int(data["current_page"])
         new_status_baca = data["status_baca"]
 
         bookCollection.rating = new_rating
@@ -275,3 +285,18 @@ def edit_collection_flutter(request,id):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
+    
+@csrf_exempt
+def delete_collection_flutter(request,id):
+    if request.method == 'POST':
+        collection = BookCollection.objects.get(pk=id)
+        collection.delete()
+
+        return JsonResponse({"status": "success"}, status=200)
+    
+    return JsonResponse({"status": "error"}, status=401)
+
+def check_collection_json(request,id):
+    book = Book.objects.get(pk=id)
+    book_collection = BookCollection.objects.filter(book=book,user=request.user)
+    return HttpResponse(serializers.serialize("json", book_collection), content_type="application/json")
