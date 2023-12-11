@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from administrator.models import BookQueue
 from administrator.forms import QueueForm
 from shared_models.models import Book
@@ -156,6 +156,36 @@ def create_queue_flutter(request):
 
         new_item.save()
 
-        return HttpResponse("Successfully added book queue", status=200)
+        return JsonResponse({"status": "success"}, status=200)
     else:
-        return HttpResponseBadRequest("Failed to add book queue")
+        return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def delete_queue_flutter(request, id):
+    bookQueue = BookQueue.objects.get(pk=id)
+    bookQueue.delete()
+    return JsonResponse({"status": "success"}, status=200)
+
+def request_json(request):
+    bookRequest = BookRequest.objects.all()
+    return HttpResponse(serializers.serialize("json", bookRequest), content_type = "application/json")
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def delete_request_flutter(request, id):
+    bookRequest = BookRequest.objects.get(pk=id)
+    bookRequest.delete()
+    return JsonResponse({"status": "success"}, status=200)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def confirm_queue(request):
+    queues = BookQueue.objects.filter(user=request.user)
+    for queue in queues:
+        books = Book.objects.filter(ISBN=queue.ISBN)
+        if len(books) == 0:
+            new_book = Book(title=queue.title, author=queue.author, description=queue.description, publisher=queue.publisher, page_count=queue.page_count, genre=queue.genre, ISBN=queue.ISBN, language=queue.language, published_date=queue.published_date)
+            new_book.save()
+        queue.delete()
+    return JsonResponse({"status": "success"}, status=200)

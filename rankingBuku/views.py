@@ -10,6 +10,8 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 
+from shared_models.models import Book
+
 # Create your views here.
 def show_book_lists(request):
     book_lists = ListBook.objects.all()
@@ -46,7 +48,7 @@ def get_book_list_json(request):
     return HttpResponse(serializers.serialize('json', booklists))
 
 def get_my_book_lists(request):
-    booklists = ListBook.objects.filter(user=request.user)
+    booklists = ListBook.objects.filter(user = request.user)
     return HttpResponse(serializers.serialize('json', booklists))
 
 def get_book_list_byid(request):
@@ -75,9 +77,13 @@ def delete_listbook(request, id):
 
 @csrf_exempt
 @login_required(login_url='/authentication/login')
-def create_booklist_flutter(request):
+def create_booklist_flutter1(request):
     if request.method == 'POST':
         data = json.loads(request.body)
+        book_data = []
+
+        for book in data["books"]:
+            book_data.append(Book.objects.get(pk=book))
 
         new_product = ListBook.objects.create(
             user=request.user,
@@ -86,7 +92,7 @@ def create_booklist_flutter(request):
             image = "https://i.imgur.com/CFVTM7y.png",
             # Additional fields
             access=data["access"],
-            books=data["books"],
+            books=book_data
         )
 
         new_product.save()
@@ -109,3 +115,53 @@ def get_booklists_json(request):
         }
         data.append(item)
     return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def create_booklist_flutter(request):
+    if request.method == 'POST':
+        try:
+            # Assuming the Flutter app sends JSON data in the request body
+            data = json.loads(request.body)
+
+            # Extract data from JSON
+            name = data.get('name')
+            description = data.get('description')
+            access = data.get('access')
+            books = data.get('books')
+
+            # Get the current user
+            user = request.user
+            print(name)
+
+            # Create ListBook instance
+            list_book = ListBook.objects.create(
+                name=name,
+                description=description,
+                access=access,
+                user=user,
+                image='https://i.imgur.com/CFVTM7y.png'
+            )
+
+            # Add books to the list
+            for book_id in books:
+                try:
+                    book = Book.objects.get(pk=book_id)
+                    list_book.books.add(book)
+                except Book.DoesNotExist:
+                    # Handle the case when the book with the given ID does not exist
+                    pass
+
+            # Return response
+            response_data = {
+                'name': list_book.name,
+                'description': list_book.description,
+                'access': list_book.access,
+                'books': list(list_book.books.values_list('id', flat=True)),
+            }
+
+            return JsonResponse(response_data, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
