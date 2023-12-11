@@ -131,8 +131,6 @@ def create_booklist_flutter(request):
 
             # Get the current user
             user = request.user
-            print(name)
-
             # Create ListBook instance
             list_book = ListBook.objects.create(
                 name=name,
@@ -165,3 +163,13 @@ def create_booklist_flutter(request):
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def delete_flutter(request,id):
+    if request.method == 'POST':
+        booklist = ListBook.objects.get(pk=id)
+        booklist.delete()
+
+        return JsonResponse({"status": "success"}, status=200)
+    
+    return JsonResponse({"status": "error"}, status=401)
