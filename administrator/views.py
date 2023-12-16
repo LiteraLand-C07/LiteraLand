@@ -141,6 +141,13 @@ def create_queue_flutter(request):
     if request.method == 'POST':
         
         data = json.loads(request.body)
+
+        books = Book.objects.filter(ISBN=data["ISBN"])
+        allQueue = BookQueue.objects.filter(ISBN=data["ISBN"])
+
+        if len(books) != 0 or len(allQueue) != 0:
+            return JsonResponse({"status": "already_exist"}, status=401)
+        
         new_item = BookQueue.objects.create(
             user = request.user,
             title = data["title"],
