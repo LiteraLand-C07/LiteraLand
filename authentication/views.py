@@ -14,12 +14,23 @@ def login(request):
         if user.is_active:
             auth_login(request, user)
             # Status login sukses.
+
+            if request.user.is_superuser:
+                return JsonResponse({
+                    "username": user.username,
+                    "status": True,
+                    "message": "Login sukses!",
+                    "isAdmin": True,
+                    # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
+                }, status=200)
+            
             return JsonResponse({
-                "username": user.username,
-                "status": True,
-                "message": "Login sukses!"
-                # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
-            }, status=200)
+                    "username": user.username,
+                    "status": True,
+                    "message": "Login sukses!",
+                    "isAdmin": False
+                    # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
+                }, status=200)
         else:
             return JsonResponse({
                 "status": False,
