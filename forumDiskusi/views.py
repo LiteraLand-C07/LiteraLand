@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 
 from shared_models.models import Book
 from .models import BookReview
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from shared_models.models import Book
@@ -109,3 +109,17 @@ def book_reviews_id(request, book_id):
     # Convert reviews to JSON
     reviews_json = list(reviews.values('user__username', 'review', 'star_rating', 'reviewer_name', 'date'))
     return JsonResponse({'reviews': reviews_json})
+
+@csrf_exempt
+def delete_flutter(request, book_id):
+    if request.method == "POST":
+        review_id = request.POST.get('review_id')
+        try:
+            review = BookReview.objects.get(pk=review_id)
+            review.delete()
+            return JsonResponse({'status': 'success', 'message': 'Review deleted successfully'})
+        except BookReview.DoesNotExist:
+            return JsonResponse({'status': 'fail', 'message': 'Review does not exist'})
+    else:
+        return HttpResponseNotAllowed(['POST'])
+
